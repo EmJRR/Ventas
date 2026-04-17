@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SoluVentas | Premium Sales & Inventory</title>
+    <title>SoluVentas</title>
     <meta name="description"
         content="Sistema integral de ventas, inventario y gestión de deudas con diseño ejecutivo Glassmorphic.">
     <!-- Google Fonts: Manrope & Inter -->
@@ -21,6 +21,13 @@
 </head>
 
 <body>
+    <!-- Indicador del Dólar - Flotante en esquina superior derecha -->
+    <div id="dolar-indicator" class="dolar-indicator">
+        <span class="dolar-icon">💵</span>
+        <span class="dolar-label">Dólar BCV:</span>
+        <span id="dolar-value" class="dolar-value">Cargando...</span>
+        <span id="dolar-date" class="dolar-date"></span>
+    </div>
     <!-- Modales (Asegurado en el root del body) -->
     <div id="modal-container" class="modal-overlay">
         <div class="modal">
@@ -84,25 +91,6 @@
                     <span>Configuración</span>
                 </a>
             </nav>
-            <div class="sidebar-footer">
-                <div class="exchange-rate-card" id="bcv-container">
-                    <div class="rate-header">
-                        <span>Tasa BCV Hoy</span>
-                        <div class="rate-actions">
-                            <button class="rate-btn" id="refresh-bcv" title="Refrescar tasa"><i data-lucide="refresh-cw"></i></button>
-                            <button class="rate-btn" id="manual-bcv" title="Editar manual"><i data-lucide="edit-2"></i></button>
-                        </div>
-                    </div>
-                    <div class="rate-value" id="bcv-value">---</div>
-                </div>
-                <div class="user-profile">
-                    <div class="avatar">AD</div>
-                    <div class="user-info">
-                        <p class="name">Admin</p>
-                        <p class="role">Online Sync</p>
-                    </div>
-                </div>
-            </div>
         </aside>
 
         <!-- Main Content -->

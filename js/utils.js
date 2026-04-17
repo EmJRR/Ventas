@@ -5,7 +5,7 @@ const UI = {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.classList.add('toast', `toast-${type}`);
-        
+
         let icon = 'check-circle';
         if (type === 'error') icon = 'alert-circle';
         if (type === 'warning') icon = 'alert-triangle';
@@ -14,7 +14,7 @@ const UI = {
             <i data-lucide="${icon}"></i>
             <span>${message}</span>
         `;
-        
+
         container.appendChild(toast);
         lucide.createIcons();
 
@@ -29,7 +29,7 @@ const UI = {
         const modalContainer = document.getElementById('modal-container');
         const modalTitle = document.getElementById('modal-title');
         const modalBody = document.getElementById('modal-body');
-        
+
         modalTitle.textContent = title;
         modalBody.innerHTML = contentHTML;
         modalContainer.classList.add('active');
@@ -130,3 +130,42 @@ toastStyle.textContent = `
     }
 `;
 document.head.appendChild(toastStyle);
+
+// Función para obtener y mostrar el tipo de cambio del Dólar BCV
+async function fetchDollarRate() {
+    const dolarValueSpan = document.getElementById('dolar-value');
+    const dolarDateSpan = document.getElementById('dolar-date');
+
+    if (!dolarValueSpan) return; // Salir si no existe el elemento en la página
+
+    try {
+        const response = await fetch('https://ve.dolarapi.com/v1/dolares');
+        const data = await response.json();
+
+        // Buscar la tasa oficial (BCV)
+        const bcvRate = data.find(rate => rate.fuente === 'oficial');
+
+        if (bcvRate && bcvRate.promedio) {
+            // Formatear el monto (ej: 480,26)
+            const formattedRate = bcvRate.promedio.toLocaleString('es-VE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            dolarValueSpan.textContent = `Bs ${formattedRate}`;
+
+            // Formatear la fecha de actualización
+            const updateDate = new Date(bcvRate.fechaActualizacion);
+            const formattedDate = updateDate.toLocaleDateString('es-VE');
+            dolarDateSpan.textContent = `(Actualizado: ${formattedDate})`;
+        } else {
+            dolarValueSpan.textContent = 'No disponible';
+        }
+    } catch (error) {
+        console.error('Error al obtener el tipo de cambio:', error);
+        dolarValueSpan.textContent = 'Error al cargar';
+    }
+}
+
+// Ejecutar la función al cargar la página
+document.addEventListener('DOMContentLoaded', fetchDollarRate);

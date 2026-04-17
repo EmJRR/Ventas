@@ -356,7 +356,7 @@ function renderDashboard() {
                             <div style="width:10px; height:10px; border-radius:50%; background:${p.stock < (settings.lowStockThreshold / 2) ? 'var(--danger)' : 'var(--tertiary)'}"></div>
                             <div style="flex:1;">
                                 <p style="font-weight:600; font-size:0.9rem; line-height:1.2;">${p.name}</p>
-                                <p style="font-size:0.75rem; color:var(--text-muted);">Código: ${p.code}</p>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">Código(s): ${p.code}</p>
                             </div>
                             <div style="text-align:right;">
                                 <span style="display:block; font-weight:800; color:${p.stock < (settings.lowStockThreshold / 2) ? 'var(--danger)' : 'var(--text-main)'}">${p.stock} u.</span>
@@ -463,7 +463,25 @@ function renderInventario() {
                 <tbody id="inventory-list">
                     ${products.map(p => `
                         <tr>
-                            <td data-label="📦 Código"><span>${p.code}</span></td>
+                            <td data-label="📦 Código">
+                                <div style="display:flex; flex-wrap:wrap; gap:4px; align-items:center;">
+                                    ${(() => {
+                                        const codes = (p.code || '').toString().split(',').map(c => c.trim()).filter(c => c);
+                                        const visible = codes.slice(0, 3);
+                                        const hidden = codes.slice(3);
+                                        let html = visible.map(c => `<span style="background:var(--bg-surface); padding:3px 6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; white-space:nowrap;">${c}</span>`).join('');
+                                        if (hidden.length > 0) {
+                                            const hiddenHtml = hidden.map(c => `<span style="background:var(--bg-surface); padding:3px 6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; white-space:nowrap;">${c}</span>`).join('');
+                                            html += `<div id="hidden-codes-${p.id}" style="display:none; gap:4px; flex-wrap:wrap; align-items:center;">
+                                                ${hiddenHtml}
+                                                <button onclick="document.getElementById('hidden-codes-${p.id}').style.display='none'; document.getElementById('btn-expand-${p.id}').style.display='inline-flex'; event.stopPropagation();" style="background:#ef4444; border:none; border-radius:4px; color:white; padding:3px 8px; font-weight:800; cursor:pointer; font-size:0.75rem; transition:0.2s; display:flex; align-items:center; justify-content:center;" title="Contraer">X</button>
+                                            </div>`;
+                                            html += `<button id="btn-expand-${p.id}" onclick="document.getElementById('hidden-codes-${p.id}').style.display='flex'; this.style.display='none'; event.stopPropagation();" style="background:var(--border-color); border:none; border-radius:4px; color:var(--text-main); padding:2px 8px; font-weight:700; cursor:pointer; font-size:0.7rem; transition:0.2s; display:inline-flex; align-items:center;" title="Ver ${hidden.length} códigos más">...</button>`;
+                                        }
+                                        return html;
+                                    })()}
+                                </div>
+                            </td>
                             <td data-label="🏷️ Nombre"><span>${p.name}</span></td>
                             <td data-label="💲 Precio">
                                 <div style="display:flex; flex-direction:column; align-items:flex-end;">
@@ -1420,7 +1438,7 @@ function showAddProductModal() {
     UI.openModal("Agregar Nuevo Producto (Precios en USD)", `
         <form id="product-form" onsubmit="event.preventDefault(); saveProduct()">
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                <div style="margin-bottom:12px;"> <label>Código</label><input type="text" id="p-code" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px;"> <label>Código(s) (Ej. COD1, COD2)</label><input type="text" id="p-code" placeholder="Ej: COD1, COD2" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Nombre</label><input type="text" id="p-name" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="number" step="0.01" id="p-cost" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>% de Ganancia</label><input type="number" id="p-margin" value="20" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
@@ -1463,7 +1481,7 @@ function showEditProductModal(id) {
     UI.openModal("Editar Producto", `
         <form id="edit-product-form" onsubmit="event.preventDefault(); updateProduct(${id})">
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                <div style="margin-bottom:12px;"> <label>Código</label><input type="text" id="p-code" value="${p.code}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px;"> <label>Código(s) (Ej. COD1, COD2)</label><input type="text" id="p-code" value="${p.code}" placeholder="Ej: COD1, COD2" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Nombre</label><input type="text" id="p-name" value="${p.name}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="number" step="0.01" id="p-cost" value="${p.costUSD || p.priceUSD}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>% de Ganancia</label><input type="number" id="p-margin" value="${p.profitMargin || 20}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>

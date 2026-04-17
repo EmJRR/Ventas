@@ -15,7 +15,7 @@
     --text-muted: #64748b;
     --border-color: rgba(99, 102, 241, 0.1);
     --sidebar-bg: #ffffff;
-    
+
     /* Frosted Shadows & Glows */
     --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 12px 24px rgba(99, 102, 241, 0.08);
@@ -50,7 +50,11 @@ body {
     letter-spacing: -0.01em;
 }
 
-h1, h2, h3, h4, .logo {
+h1,
+h2,
+h3,
+h4,
+.logo {
     font-family: 'Manrope', 'Inter', sans-serif;
     letter-spacing: -0.02em;
     font-weight: 700;
@@ -362,7 +366,8 @@ h1, h2, h3, h4, .logo {
 
     td:last-child {
         display: flex;
-        flex-direction: row; /* Mantener botones en fila si hay más de uno */
+        flex-direction: row;
+        /* Mantener botones en fila si hay más de uno */
         justify-content: flex-start;
         gap: 8px;
         padding-top: 16px;
@@ -437,12 +442,35 @@ h1, h2, h3, h4, .logo {
     height: 24px;
 }
 
-.stat-icon.purple { background: rgba(124, 58, 237, 0.1); color: #7c3aed; }
-.stat-icon.orange { background: rgba(245, 158, 11, 0.1); color: #d97706; }
-.stat-icon.blue { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
-.stat-icon.green { background: rgba(16, 185, 129, 0.1); color: #059669; }
-.stat-icon.red { background: rgba(244, 63, 94, 0.1); color: #e11d48; }
-.stat-icon.indigo { background: rgba(99, 102, 241, 0.1); color: #4f46e5; }
+.stat-icon.purple {
+    background: rgba(124, 58, 237, 0.1);
+    color: #7c3aed;
+}
+
+.stat-icon.orange {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.stat-icon.blue {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+.stat-icon.green {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.stat-icon.red {
+    background: rgba(244, 63, 94, 0.1);
+    color: #e11d48;
+}
+
+.stat-icon.indigo {
+    background: rgba(99, 102, 241, 0.1);
+    color: #4f46e5;
+}
 
 .badge {
     padding: 6px 12px;
@@ -453,8 +481,15 @@ h1, h2, h3, h4, .logo {
     letter-spacing: 0.02em;
 }
 
-.bg-success { background: #dcfce7; color: #166534; }
-.bg-danger { background: #fee2e2; color: #991b1b; }
+.bg-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.bg-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
 
 /* Dashboard Chart container specifics */
 #salesTrendsChart {
@@ -642,7 +677,9 @@ h1, h2, h3, h4, .logo {
     }
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 12px;
@@ -654,7 +691,8 @@ input, select, textarea {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     background: #ffffff;
     border-color: var(--primary-solid);
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.05);
@@ -733,13 +771,15 @@ input:focus, select:focus {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(15, 23, 42, 0.7); /* Oscurecer más el fondo */
+    background: rgba(15, 23, 42, 0.7);
+    /* Oscurecer más el fondo */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 9999 !important; /* Estar por encima de TODO */
+    z-index: 9999 !important;
+    /* Estar por encima de TODO */
     padding: 20px;
     animation: fadeIn 0.25s ease-out;
 }
@@ -752,13 +792,15 @@ input:focus, select:focus {
     background: #ffffff !important;
     width: 95%;
     max-width: 500px;
-    max-height: 90vh; /* No exceder el alto de pantalla */
+    max-height: 90vh;
+    /* No exceder el alto de pantalla */
     border-radius: var(--border-radius-lg);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(0, 0, 0, 0.1);
     overflow: hidden;
     position: relative;
-    display: flex; /* Para manejar header y content */
+    display: flex;
+    /* Para manejar header y content */
     flex-direction: column;
     z-index: 10000;
     animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1082,6 +1124,7 @@ input:focus, select:focus {
 /* FORZAR VISIBILIDAD EN MÓVIL - Agrega esto al final de tu CSS */
 /* FORZAR VISIBILIDAD EN MÓVIL - Refactorizado para Light Glassmorphism */
 @media (max-width: 768px) {
+
     .inventory-table-responsive,
     .inventory-table-responsive tbody,
     .inventory-table-responsive tr,
@@ -1100,7 +1143,7 @@ input:focus, select:focus {
         border: 1px solid rgba(0, 0, 0, 0.05) !important;
         border-radius: var(--border-radius-lg) !important;
         padding: 24px !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.03) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03) !important;
         position: relative;
     }
 
@@ -1136,7 +1179,7 @@ input:focus, select:focus {
     }
 
     /* El contenido de la celda (el valor real) */
-    .inventory-table-responsive td > *:not(::before) {
+    .inventory-table-responsive td>*:not(::before) {
         display: inline-block !important;
         text-align: right !important;
         color: var(--text-main) !important;
@@ -1149,7 +1192,7 @@ input:focus, select:focus {
         align-items: flex-start !important;
     }
 
-    .inventory-table-responsive td[data-label="💲 Precio"] > div {
+    .inventory-table-responsive td[data-label="💲 Precio"]>div {
         align-items: flex-end !important;
     }
 
@@ -1168,4 +1211,83 @@ input:focus, select:focus {
     bottom: calc(var(--bottom-nav-height) + 12px);
     right: 12px;
     z-index: 999;
+}
+
+/* Indicador de dólar - Base */
+.dolar-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dolar-icon {
+    margin-right: 5px;
+}
+
+.dolar-label {
+    margin-right: 5px;
+}
+
+.dolar-date {
+    font-size: 10px;
+    margin-left: 8px;
+    opacity: 0.8;
+}
+
+/* ESTILOS PARA MÓVILES */
+@media screen and (max-width: 768px) {
+    .dolar-indicator {
+        padding: 6px 12px;
+        background: rgba(0, 0, 0, 0.9);
+    }
+
+    /* Ocultar texto "Dólar BCV:" y la fecha en móviles */
+    .dolar-label,
+    .dolar-date {
+        display: none;
+    }
+
+    /* Mostrar solo icono + valor */
+    .dolar-indicator {
+        font-size: 13px;
+        padding: 5px 10px;
+    }
+
+    .dolar-icon {
+        margin-right: 4px;
+        font-size: 14px;
+    }
+}
+
+/* Para tablets (opcional - mostrar texto reducido) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .dolar-label {
+        display: inline;
+    }
+
+    .dolar-date {
+        display: none;
+        /* Ocultar fecha en tablets para ahorrar espacio */
+    }
+}
+
+/* Efecto hover en desktop */
+@media screen and (min-width: 769px) {
+    .dolar-indicator:hover {
+        transform: translateY(-2px);
+        background: rgba(0, 0, 0, 0.95);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
 }

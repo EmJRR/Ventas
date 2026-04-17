@@ -100,5 +100,41 @@
     "date": "2026-04-16T23:58:55.439Z",
     "type": "sistema",
     "message": "Backup automático diario generado"
+  },
+  {
+    "id": 1776447043285,
+    "date": "2026-04-17T17:30:43.285Z",
+    "type": "inventario",
+    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
+  },
+  {
+    "id": 1776447102100,
+    "date": "2026-04-17T17:31:42.100Z",
+    "type": "inventario",
+    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
+  },
+  {
+    "id": 1776447111540,
+    "date": "2026-04-17T17:31:51.540Z",
+    "type": "inventario",
+    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
+  },
+  {
+    "id": 1776447128484,
+    "date": "2026-04-17T17:32:08.484Z",
+    "type": "inventario",
+    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
+  },
+  {
+    "id": 1776447152668,
+    "date": "2026-04-17T17:32:32.668Z",
+    "type": "inventario",
+    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
+  },
+  {
+    "id": 1776450374240,
+    "date": "2026-04-17T18:26:14.240Z",
+    "type": "sistema",
+    "message": "REINICIO TOTAL DEL SISTEMA - Se eliminaron todos los registros"
   }
 ]
