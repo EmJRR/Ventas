@@ -17,7 +17,14 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Html5-QRCode for Barcode Scanning -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <link rel="stylesheet" href="css/main.css">
+    <style>
+        #scanner-container { border: 2px dashed #6366f1 !important; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 15px; }
+        #reader { width: 100% !important; min-height: 250px; background: #000; }
+        #reader video { width: 100% !important; height: auto !important; object-fit: cover; }
+    </style>
 </head>
 
 <body>

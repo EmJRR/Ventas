@@ -4,7 +4,8 @@
   "description": "Sistema de ventas local para Windows 7",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "share": "npx localtunnel --port 3000"
   },
   "dependencies": {
     "express": "^4.18.2",

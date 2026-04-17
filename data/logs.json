@@ -52,5 +52,17 @@
     "date": "2026-04-17T19:36:53.709Z",
     "type": "sistema",
     "message": "Backup automático diario generado"
+  },
+  {
+    "id": 1776443590784,
+    "date": "2026-04-17T16:33:10.784Z",
+    "type": "sistema",
+    "message": "Restauración de backup aplicada: 17/4/2026"
+  },
+  {
+    "id": 1776444894731,
+    "date": "2026-04-17T16:54:54.731Z",
+    "type": "sistema",
+    "message": "Backup automático guardado en el servidor"
   }
 ]

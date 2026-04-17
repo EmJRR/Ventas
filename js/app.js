@@ -43,7 +43,7 @@ function checkAutoBackup() {
     }
 }
 
-function performAutoBackup() {
+function performAutoBackup(isManual = false) {
     try {
         const backupData = {
             version: '2.0',
@@ -53,58 +53,85 @@ function performAutoBackup() {
             sales: Storage.get('sales'),
             payments: Storage.get('payments'),
             egresos: Storage.get('egresos'),
+            logs: Storage.get('logs'),
             settings: Storage.get('settings')
         };
         const json = JSON.stringify(backupData, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `soluventas_backup_${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        localStorage.setItem('soluventas_last_backup', Date.now().toString());
-        addLog('sistema', 'Backup automático diario generado');
-        UI.showToast('Backup automático generado', 'success');
+
+        if (isManual) {
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `soluventas_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            UI.showToast('Respaldo descargado', 'success');
+        } else {
+            fetch(`${window.location.origin}/api/backup/silent`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: json
+            }).then(res => {
+                if (res.ok) {
+                    localStorage.setItem('soluventas_last_backup', Date.now().toString());
+                    addLog('sistema', 'Backup automático guardado en el servidor');
+                    console.log("✅ Backup silencioso completado");
+                }
+            }).catch(e => console.error("Error backup:", e));
+        }
     } catch (e) {
         console.error('Backup failed:', e);
     }
 }
 
-function restoreBackup(file) {
-    if (!file) return;
+async function restoreBackup(file) {
+    if (!file) {
+        UI.showToast('Selecciona un archivo primero', 'warning');
+        return;
+    }
+    
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
         try {
             const data = JSON.parse(e.target.result);
-            if (!data.version || !data.products) throw new Error('Formato inválido');
-            const backupDate = data.timestamp ? data.timestamp.split('T')[0] : 'fecha desconocida';
-            if (!confirm(`¿Restaurar backup del ${backupDate}?\nSe reemplazarán TODOS los datos actuales. Esta acción no se puede deshacer.`)) return;
+            if (!data.products || !data.sales) throw new Error('Formato inválido');
+            
+            const backupDate = data.timestamp ? new Date(data.timestamp).toLocaleDateString() : 'fecha desconocida';
+            if (!confirm(`¿Restaurar backup del ${backupDate}?\n¡ATENCIÓN! Se borrarán todos los datos actuales y se reemplazarán por los del respaldo.`)) return;
 
-            // Guardar directamente en localStorage (no depende de fetch al servidor)
-            const keysToRestore = ['products', 'clients', 'sales', 'payments', 'egresos', 'settings'];
-            keysToRestore.forEach(key => {
-                const val = data[key];
-                if (val !== undefined && val !== null) {
-                    localStorage.setItem(`soluventas_${key}`, JSON.stringify(val));
-                }
-            });
+            UI.showToast('Restaurando datos...', 'info');
 
-            // Agregar log de restauración al array de logs actual y guardarlo
-            const restoredLogs = data.logs || [];
-            restoredLogs.push({
+            // Actualizar variables globales
+            products = data.products || [];
+            clients = data.clients || [];
+            sales = data.sales || [];
+            payments = data.payments || [];
+            egresos = data.egresos || [];
+            settings = data.settings || settings;
+            logs = data.logs || [];
+
+            // Agregar log de restauración
+            logs.push({
                 id: Date.now(),
                 date: new Date().toISOString(),
                 type: 'sistema',
-                message: `Restauración de backup aplicada: ${data.timestamp || 'sin fecha'}`
+                message: `Restauración de backup aplicada: ${backupDate}`
             });
-            localStorage.setItem('soluventas_logs', JSON.stringify(restoredLogs));
 
-            UI.showToast('Backup restaurado correctamente. Recargando...', 'success');
-            setTimeout(() => location.reload(), 1800);
+            // Sincronizar TODO al servidor y localStorage
+            const success = await saveAll();
+            
+            if (success) {
+                UI.showToast('Backup restaurado y sincronizado correctamente', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                throw new Error('Error al sincronizar con el servidor');
+            }
+
         } catch (err) {
             console.error('Error al restaurar backup:', err);
-            UI.showToast('Error: archivo de backup inválido o corrupto', 'error');
+            UI.showToast('Error: el archivo no es un backup válido de SoluVentas', 'error');
         }
     };
     reader.readAsText(file);
@@ -127,6 +154,105 @@ const mobileToggle = document.getElementById('mobile-toggle');
 const sidebar = document.getElementById('sidebar');
 const mobileClose = document.getElementById('mobile-close');
 const mobileMore = document.getElementById('mobile-more');
+// Scanner Logic
+UI.startScanning = function (targetId, isQuickAdd = false) {
+    const container = document.getElementById('scanner-container');
+    const readerDiv = document.getElementById('reader');
+    if (!container || !readerDiv) return;
+
+    // UI Feedback
+    container.style.display = 'block';
+    readerDiv.innerHTML = '<div style="height:250px; display:flex; align-items:center; justify-content:center; color:white; flex-direction:column; gap:10px;"><div class="spinner"></div><span>Iniciando Cámara...</span></div>';
+
+    setTimeout(() => {
+        if (window.html5QrCode) {
+            window.html5QrCode.stop().then(() => startScan(targetId, isQuickAdd)).catch(() => startScan(targetId, isQuickAdd));
+        } else {
+            startScan(targetId, isQuickAdd);
+        }
+    }, 500); // 500ms para asegurar renderizado de contenedor
+};
+
+async function startScan(targetId, isQuickAdd) {
+    const readerDiv = document.getElementById('reader');
+    try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (!cameras || cameras.length === 0) {
+            readerDiv.innerHTML = '<p style="color:white; padding:20px;">No se detectaron cámaras.</p>';
+            return;
+        }
+
+        // Seleccionar preferiblemente la cámara trasera (suele ser la última del array)
+        const backCamera = cameras.find(c => c.label.toLowerCase().includes('back') || c.label.toLowerCase().includes('trasera')) || cameras[cameras.length - 1];
+
+        const html5QrCode = new Html5Qrcode("reader");
+        window.html5QrCode = html5QrCode;
+        
+        const config = { 
+            fps: 10, 
+            qrbox: (viewWidth, viewHeight) => {
+                const width = Math.min(viewWidth * 0.8, 300);
+                const height = Math.min(viewHeight * 0.5, 150);
+                return { width, height };
+            }
+        };
+
+        await html5QrCode.start(
+            backCamera.id,
+            config,
+            (decodedText) => {
+                const input = document.getElementById(targetId);
+                if (input) {
+                    if (isQuickAdd) {
+                        const prod = products.find(p => p.code.toLowerCase().split(',').map(c => c.trim()).includes(decodedText.toLowerCase()));
+                        if (prod) {
+                            addToCart(prod.id);
+                            UI.showToast(`Agregado: ${prod.name}`, 'success');
+                        } else {
+                            UI.showToast(`Código ${decodedText} no encontrado`, 'warning');
+                        }
+                    } else {
+                        let val = input.value.trim();
+                        let codes = val ? val.split(',').map(c => c.trim()) : [];
+                        if (!codes.includes(decodedText)) {
+                            codes.push(decodedText);
+                            input.value = codes.join(', ');
+                        }
+                        UI.showToast("Código capturado: " + decodedText);
+                    }
+                }
+                UI.stopScanning();
+            }
+        );
+    } catch (e) {
+        console.error("Camera error:", e);
+        readerDiv.innerHTML = `<p style="color:#ff6b6b; padding:20px; font-size:0.8rem;">Error: ${e.message || e}<br><br>Si usas IP local, asegúrate de habilitar 'Insecure origins' en chrome://flags</p>`;
+        setTimeout(UI.stopScanning, 5000);
+    }
+}
+
+function stopScanAndRestore() {
+    if (window.html5QrCode) {
+        window.html5QrCode.stop().then(() => {
+            window.html5QrCode = null;
+            const container = document.getElementById('scanner-container');
+            if (container) container.style.display = 'none';
+        }).catch(err => {
+            console.warn("Stop failed, forcing hide", err);
+            window.html5QrCode = null;
+            const container = document.getElementById('scanner-container');
+            if (container) container.style.display = 'none';
+        });
+    } else {
+        const container = document.getElementById('scanner-container');
+        if (container) container.style.display = 'none';
+    }
+}
+
+UI.stopScanning = function() {
+    stopScanAndRestore();
+}
+
 const modalContainer = document.getElementById('modal-container');
 
 // Initialize Icons
@@ -570,10 +696,17 @@ function renderVentas() {
             <!-- Selector de Productos -->
             <div class="data-table-container">
                 <div class="table-header">
-                    <div style="margin-bottom:20px; width: 100%;">
-                        <input type="text" placeholder="🔍 Buscar producto por nombre o código..." id="pos-search" 
+                    <div id="scanner-container" style="display:none; margin-bottom:15px; background:#f8fafc; border-radius:12px; padding:10px; border:2px dashed var(--primary); width: 100%;">
+                        <div id="reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="width:100%; margin-top:10px;">Cerrar Cámara</button>
+                    </div>
+
+                    <div style="margin-bottom:20px; width: 100%; display: flex; gap: 8px;">
+                        <input type="text" placeholder="🔍 Buscar producto..." id="pos-search" 
                             oninput="filterPOS(this.value); checkSecretCode(this.value)" 
-                            style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border-color); font-size:1rem; box-shadow:var(--shadow-sm);">
+                            style="flex:1; padding:15px; border-radius:12px; border:1px solid var(--border-color); font-size:1rem; box-shadow:var(--shadow-sm);">
+                        <button class="btn btn-primary" onclick="UI.startScanning('pos-search', true)" style="padding:0 20px;"><i data-lucide="scan"></i></button>
+                    </div>
                         
                         <div id="secret-tools" style="display:none; transition: all 0.3s ease; margin-top:12px; padding:12px; background:#f8fafc; border:2px dashed var(--primary); border-radius:12px;">
                             <p style="font-size:0.7rem; color:var(--primary); font-weight:700; margin-bottom:8px;">🛠️ MODO MANTENIMIENTO ACTIVADO</p>
@@ -1494,20 +1627,31 @@ function completeSale(targetTotalBS) {
 
 // --- Inventory Modals ---
 function showAddProductModal() {
-    UI.openModal("Agregar Nuevo Producto (Precios en USD)", `
+    UI.openModal("Agregar Nuevo Producto", `
         <form id="product-form" onsubmit="event.preventDefault(); saveProduct()">
+            <div id="scanner-container" style="display:none; margin-bottom:15px; background:#f8fafc; border-radius:12px; padding:10px; border:2px dashed var(--primary);">
+                <div id="reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="width:100%; margin-top:10px;">Cerrar Cámara</button>
+            </div>
+            
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                <div style="margin-bottom:12px;"> <label>Código(s) (Ej. COD1, COD2)</label><input type="text" id="p-code" placeholder="Ej: COD1, COD2" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>Nombre</label><input type="text" id="p-name" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px; grid-column: 1 / -1;"> 
+                    <label>Código(s) de Barra</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="p-code" placeholder="Escribe o escanea..." required style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+                        <button type="button" class="btn btn-primary" onclick="UI.startScanning('p-code')" style="padding:0 15px;"><i data-lucide="scan"></i></button>
+                    </div>
+                </div>
+                <div style="margin-bottom:12px; grid-column: 1 / -1;"> <label>Nombre del Producto</label><input type="text" id="p-name" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="number" step="0.01" id="p-cost" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>% de Ganancia</label><input type="number" id="p-margin" value="20" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>Precio Venta ($)</label><input type="number" step="0.01" id="p-price" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
+                <div style="margin-bottom:12px;"> <label>% Ganancia</label><input type="number" id="p-margin" value="20" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px;"> <label>Venta ($)</label><input type="number" step="0.01" id="p-price" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
                 <div style="margin-bottom:12px;"> <label>Stock Inicial</label><input type="number" id="p-stock" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
             </div>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;">Referencia actual: ${UI.formatCurrency(currentBCVRate)}</p>
-            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px;">Guardar Producto</button>
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px; height:50px; font-weight:700;">Guardar Producto</button>
         </form>
         `);
+    lucide.createIcons();
 }
 
 function calculatePriceUSD() {
@@ -1539,17 +1683,29 @@ function showEditProductModal(id) {
     const p = products.find(prod => prod.id == id);
     UI.openModal("Editar Producto", `
         <form id="edit-product-form" onsubmit="event.preventDefault(); updateProduct(${id})">
+            <div id="scanner-container" style="display:none; margin-bottom:15px; background:#f8fafc; border-radius:12px; padding:10px; border:2px dashed var(--primary);">
+                <div id="reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="width:100%; margin-top:10px;">Cerrar Cámara</button>
+            </div>
+
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                <div style="margin-bottom:12px;"> <label>Código(s) (Ej. COD1, COD2)</label><input type="text" id="p-code" value="${p.code}" placeholder="Ej: COD1, COD2" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>Nombre</label><input type="text" id="p-name" value="${p.name}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px; grid-column: 1 / -1;"> 
+                    <label>Código(s) de Barra</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="p-code" value="${p.code}" placeholder="Ej: COD1, COD2" required style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+                        <button type="button" class="btn btn-primary" onclick="UI.startScanning('p-code')" style="padding:0 15px;"><i data-lucide="scan"></i></button>
+                    </div>
+                </div>
+                <div style="margin-bottom:12px; grid-column: 1 / -1;"> <label>Nombre</label><input type="text" id="p-name" value="${p.name}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="number" step="0.01" id="p-cost" value="${p.costUSD || p.priceUSD}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>% de Ganancia</label><input type="number" id="p-margin" value="${p.profitMargin || 20}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px;"> <label>% Ganancia</label><input type="number" id="p-margin" value="${p.profitMargin || 20}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Precio Venta ($)</label><input type="number" step="0.01" id="p-price" value="${p.priceUSD}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
                 <div style="margin-bottom:12px;"> <label>Stock</label><input type="number" id="p-stock" value="${p.stock}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px;">Actualizar Producto</button>
         </form>
         `);
+    lucide.createIcons();
 }
 
 function updateProduct(id) {
@@ -2133,7 +2289,7 @@ function renderConfiguracion() {
                     <div style="background:var(--bg-main); border-radius:10px; padding:16px;">
                         <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">Último backup automático</div>
                         <div style="font-weight:700; margin-bottom:12px;">${lastBackupText}</div>
-                        <button class="btn btn-primary" onclick="performAutoBackup()">
+                        <button class="btn btn-primary" onclick="performAutoBackup(true)">
                             <i data-lucide="download"></i> Descargar Backup Ahora
                         </button>
                     </div>

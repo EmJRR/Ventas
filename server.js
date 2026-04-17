@@ -46,6 +46,23 @@ app.post('/api/save/:key', (req, res) => {
     });
 });
 
+// Full Backup Endpoint (Silent server-side backup)
+app.post('/api/backup/silent', (req, res) => {
+    const backupDir = path.join(__dirname, 'backups');
+    if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir);
+    
+    const filename = `backup_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    const filePath = path.join(backupDir, filename);
+    
+    fs.writeFile(filePath, JSON.stringify(req.body, null, 2), (err) => {
+        if (err) {
+            console.error('Error creating silent backup:', err);
+            return res.status(500).json({ error: 'Failed to create backup' });
+        }
+        res.json({ success: true, filename });
+    });
+});
+
 // Fallback for SPA (if needed, though it's static)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
