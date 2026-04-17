@@ -25,20 +25,23 @@ async function bootstrapApp() {
     // Inicializar UI y Eventos
     initEventListeners();
 
+    // Verificar si toca auto-backup (datos ya cargados)
+    checkAutoBackup();
+
     // Carga inicial de sección
     const section = window.location.hash.replace('#', '') || 'dashboard';
     navigateTo(section);
 }
 
-// Auto-Backup on startup
-(function initAutoBackup() {
+// Auto-Backup se llama desde bootstrapApp después de que los datos están cargados
+function checkAutoBackup() {
     const lastBackup = localStorage.getItem('soluventas_last_backup');
     const now = Date.now();
     const ONE_DAY = 24 * 60 * 60 * 1000;
     if (!lastBackup || (now - parseInt(lastBackup)) > ONE_DAY) {
-        setTimeout(performAutoBackup, 3000); // 3s after load
+        setTimeout(performAutoBackup, 3000);
     }
-})();
+}
 
 function performAutoBackup() {
     try {
@@ -75,18 +78,33 @@ function restoreBackup(file) {
         try {
             const data = JSON.parse(e.target.result);
             if (!data.version || !data.products) throw new Error('Formato inválido');
-            if (!confirm(`¿Restaurar backup del ${data.timestamp?.split('T')[0]}? Se reemplazarán todos los datos actuales.`)) return;
-            Storage.save('products', data.products);
-            Storage.save('clients', data.clients);
-            Storage.save('sales', data.sales);
-            Storage.save('payments', data.payments);
-            Storage.save('egresos', data.egresos || []);
-            Storage.save('settings', data.settings || {});
-            addLog('sistema', `Restauración de backup aplicada: ${data.timestamp}`);
-            UI.showToast('Backup restaurado. Recargando...', 'success');
-            setTimeout(() => location.reload(), 1500);
+            const backupDate = data.timestamp ? data.timestamp.split('T')[0] : 'fecha desconocida';
+            if (!confirm(`¿Restaurar backup del ${backupDate}?\nSe reemplazarán TODOS los datos actuales. Esta acción no se puede deshacer.`)) return;
+
+            // Guardar directamente en localStorage (no depende de fetch al servidor)
+            const keysToRestore = ['products', 'clients', 'sales', 'payments', 'egresos', 'settings'];
+            keysToRestore.forEach(key => {
+                const val = data[key];
+                if (val !== undefined && val !== null) {
+                    localStorage.setItem(`soluventas_${key}`, JSON.stringify(val));
+                }
+            });
+
+            // Agregar log de restauración al array de logs actual y guardarlo
+            const restoredLogs = data.logs || [];
+            restoredLogs.push({
+                id: Date.now(),
+                date: new Date().toISOString(),
+                type: 'sistema',
+                message: `Restauración de backup aplicada: ${data.timestamp || 'sin fecha'}`
+            });
+            localStorage.setItem('soluventas_logs', JSON.stringify(restoredLogs));
+
+            UI.showToast('Backup restaurado correctamente. Recargando...', 'success');
+            setTimeout(() => location.reload(), 1800);
         } catch (err) {
-            UI.showToast('Error: archivo de backup inválido', 'error');
+            console.error('Error al restaurar backup:', err);
+            UI.showToast('Error: archivo de backup inválido o corrupto', 'error');
         }
     };
     reader.readAsText(file);
@@ -225,14 +243,17 @@ function renderAuditoria() {
                         📅 ${week}
                     </div>
                     <div class="data-table-container">
-                        <table>
+                        <table class="premium-table">
                             <thead><tr><th>Fecha / Hora</th><th>Tipo</th><th>Actividad</th></tr></thead>
                             <tbody>
                                 ${groupedLogs[week].map(log => `
                                     <tr>
-                                        <td data-label="Fecha / Hora" style="white-space:nowrap; font-size:0.8rem; color:var(--text-muted);">${UI.formatDate(log.date)}</td>
-                                        <td data-label="Tipo"><span class="badge badge-type-${log.type}">${log.type}</span></td>
-                                        <td data-label="Actividad" style="font-size:0.9rem;">${log.message}</td>
+                                        <td data-label="Fecha / Hora">
+                                            <p style="font-weight:600; color:var(--text-main); font-size:0.85rem;">${UI.formatDate(log.date).split(',')[0]}</p>
+                                            <p style="font-size:0.75rem; color:var(--text-muted);">${UI.formatDate(log.date).split(',')[1] || ''}</p>
+                                        </td>
+                                        <td data-label="Tipo"><span class="badge badge-type-${log.type}" style="padding:4px 10px; font-weight:700; font-size:0.7rem; text-transform:uppercase;">${log.type}</span></td>
+                                        <td data-label="Actividad" style="font-weight:500; font-size:0.85rem; color:var(--text-main);">${log.message}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -262,18 +283,30 @@ function exportLogsCSV() {
 // 1. Dashboard Logic
 function renderDashboard() {
     const totalSalesBS = sales.reduce((acc, s) => acc + (s.totalBS || 0), 0);
+    const totalSalesUSD = currentBCVRate > 0 ? (totalSalesBS / currentBCVRate) : 0;
+    
     const totalDebt = clients.reduce((acc, c) => acc + c.debt, 0);
+    const totalDebtUSD = currentBCVRate > 0 ? (totalDebt / currentBCVRate) : 0;
+    
     const clientCount = clients.length;
 
     contentArea.innerHTML = `
         <div class="dashboard-stats">
             <div class="stat-card">
                 <div class="stat-icon purple"><i data-lucide="trending-up"></i></div>
-                <div class="stat-info"><h3>Ventas Totales</h3><p>${UI.formatCurrency(totalSalesBS)}</p></div>
+                <div class="stat-info">
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">VENTAS TOTALES</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">${UI.formatUSD(totalSalesUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalSalesBS)}</span>
+                </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon orange"><i data-lucide="wallet"></i></div>
-                <div class="stat-info"><h3>Deuda Total</h3><p>${UI.formatCurrency(totalDebt)}</p></div>
+                <div class="stat-info">
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">DEUDA TOTAL</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">${UI.formatUSD(totalDebtUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalDebt)}</span>
+                </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon blue"><i data-lucide="users"></i></div>
@@ -466,20 +499,20 @@ function renderInventario() {
                             <td data-label="📦 Código">
                                 <div style="display:flex; flex-wrap:wrap; gap:4px; align-items:center;">
                                     ${(() => {
-                                        const codes = (p.code || '').toString().split(',').map(c => c.trim()).filter(c => c);
-                                        const visible = codes.slice(0, 3);
-                                        const hidden = codes.slice(3);
-                                        let html = visible.map(c => `<span style="background:var(--bg-surface); padding:3px 6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; white-space:nowrap;">${c}</span>`).join('');
-                                        if (hidden.length > 0) {
-                                            const hiddenHtml = hidden.map(c => `<span style="background:var(--bg-surface); padding:3px 6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; white-space:nowrap;">${c}</span>`).join('');
-                                            html += `<div id="hidden-codes-${p.id}" style="display:none; gap:4px; flex-wrap:wrap; align-items:center;">
+            const codes = (p.code || '').toString().split(',').map(c => c.trim()).filter(c => c);
+            const visible = codes.slice(0, 3);
+            const hidden = codes.slice(3);
+            let html = visible.map(c => `<span style="background:var(--bg-surface); padding:3px 6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; white-space:nowrap;">${c}</span>`).join('');
+            if (hidden.length > 0) {
+                const hiddenHtml = hidden.map(c => `<span style="background:var(--bg-surface); padding:3px 6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; white-space:nowrap;">${c}</span>`).join('');
+                html += `<div id="hidden-codes-${p.id}" style="display:none; gap:4px; flex-wrap:wrap; align-items:center;">
                                                 ${hiddenHtml}
                                                 <button onclick="document.getElementById('hidden-codes-${p.id}').style.display='none'; document.getElementById('btn-expand-${p.id}').style.display='inline-flex'; event.stopPropagation();" style="background:#ef4444; border:none; border-radius:4px; color:white; padding:3px 8px; font-weight:800; cursor:pointer; font-size:0.75rem; transition:0.2s; display:flex; align-items:center; justify-content:center;" title="Contraer">X</button>
                                             </div>`;
-                                            html += `<button id="btn-expand-${p.id}" onclick="document.getElementById('hidden-codes-${p.id}').style.display='flex'; this.style.display='none'; event.stopPropagation();" style="background:var(--border-color); border:none; border-radius:4px; color:var(--text-main); padding:2px 8px; font-weight:700; cursor:pointer; font-size:0.7rem; transition:0.2s; display:inline-flex; align-items:center;" title="Ver ${hidden.length} códigos más">...</button>`;
-                                        }
-                                        return html;
-                                    })()}
+                html += `<button id="btn-expand-${p.id}" onclick="document.getElementById('hidden-codes-${p.id}').style.display='flex'; this.style.display='none'; event.stopPropagation();" style="background:var(--border-color); border:none; border-radius:4px; color:var(--text-main); padding:2px 8px; font-weight:700; cursor:pointer; font-size:0.7rem; transition:0.2s; display:inline-flex; align-items:center;" title="Ver ${hidden.length} códigos más">...</button>`;
+            }
+            return html;
+        })()}
                                 </div>
                             </td>
                             <td data-label="🏷️ Nombre"><span>${p.name}</span></td>
@@ -527,6 +560,7 @@ function renderInventario() {
             UI.searchTable('inventory-search', 'inventory-list');
         });
     }
+    UI.paginateTable('inventory-list', 15);
 }
 // 3. Ventas (Nueva Venta) Logic
 let cart = [];
@@ -750,6 +784,7 @@ function renderClientes() {
     document.getElementById('client-search').addEventListener('input', () => {
         UI.searchTable('client-search', 'clients-list');
     });
+    UI.paginateTable('clients-list', 15);
 }
 
 function exportClientesCSV() {
@@ -808,7 +843,7 @@ function renderHistorial() {
         </div>
     `;
     lucide.createIcons();
-    filterHistorialByDate(); 
+    filterHistorialByDate();
 }
 
 function filterHistorialByDate() {
@@ -878,8 +913,9 @@ function filterHistorialByDate() {
                     <i data-lucide="shopping-cart"></i>
                 </div>
                 <div class="stat-info">
-                    <p>${UI.formatUSD(totalGeneratedUSD)}</p>
-                    <span>Total Vendido</span>
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase;">Total Vendido</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">${UI.formatUSD(totalGeneratedUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalGeneratedBS)}</span>
                 </div>
             </div>
             <div class="stat-card">
@@ -887,8 +923,9 @@ function filterHistorialByDate() {
                     <i data-lucide="trending-down"></i>
                 </div>
                 <div class="stat-info">
-                    <p>${UI.formatUSD(totalInvestmentUSD)}</p>
-                    <span>Inversión</span>
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase;">Inversión</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--danger);">${UI.formatUSD(totalInvestmentUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalInvestmentUSD * currentBCVRate)}</span>
                 </div>
             </div>
             <div class="stat-card">
@@ -896,8 +933,9 @@ function filterHistorialByDate() {
                     <i data-lucide="${totalProfitUSD >= 0 ? 'trending-up' : 'trending-down'}"></i>
                 </div>
                 <div class="stat-info">
-                    <p style="color: ${totalProfitUSD >= 0 ? 'var(--success)' : 'var(--danger)'};">${UI.formatUSD(totalProfitUSD)}</p>
-                    <span>Ganancia Neta</span>
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase;">Ganancia Neta</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: ${totalProfitUSD >= 0 ? 'var(--success)' : 'var(--danger)'};">${UI.formatUSD(totalProfitUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalProfitBS)}</span>
                 </div>
             </div>
             <div class="stat-card">
@@ -905,8 +943,9 @@ function filterHistorialByDate() {
                     <i data-lucide="award"></i>
                 </div>
                 <div class="stat-info">
-                    <p style="font-size:0.9rem;">${mostSold}</p>
-                    <span>Más Vendido (${mostSoldQty})</span>
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase;">Más Vendido</h3>
+                    <p style="font-weight: 800; font-size: 1.1rem; color: var(--text-main);">${mostSold}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Cant: ${mostSoldQty} unids.</span>
                 </div>
             </div>
         </div>
@@ -917,7 +956,7 @@ function filterHistorialByDate() {
         const client = clients.find(c => c.id == s.clientId);
         const clientName = client ? client.name : (s.clientName || 'General');
         const initials = clientName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        
+
         return `
             <tr>
                 <td data-label="Fecha y Ref">
@@ -962,6 +1001,7 @@ function filterHistorialByDate() {
     }).join('') : '<tr><td colspan="6" style="text-align:center; padding: 40px; color:var(--text-muted);">No se encontraron ventas para este periodo</td></tr>';
 
     lucide.createIcons();
+    UI.paginateTable('history-list-body', 15);
 }
 
 // 6. Egresos Logic
@@ -989,7 +1029,7 @@ function renderEgresos() {
 
         <div class="data-table-container">
             <div class="table-header"><h3>Listado de Egresos / Gastos</h3></div>
-            <table>
+            <table class="premium-table">
                 <thead>
                     <tr>
                         <th>Fecha</th>
@@ -997,18 +1037,36 @@ function renderEgresos() {
                         <th>Monto USD</th>
                         <th>Monto Bs.</th>
                         <th>Tasa</th>
-                        <th>Acciones</th>
+                        <th style="text-align:right;">Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="egresos-list">
                     ${egresos.length > 0 ? egresos.slice().reverse().map(e => `
                         <tr>
-                            <td data-label="Fecha">${UI.formatDate(e.date)}</td>
-                            <td data-label="Concepto"><strong>${e.category}</strong><br><small>${e.description}</small></td>
-                            <td data-label="Monto USD">${UI.formatUSD(e.amountUSD)}</td>
-                            <td data-label="Monto Bs.">${UI.formatCurrency(e.amountBS)}</td>
-                            <td data-label="Tasa">${e.bcvRate.toFixed(2)}</td>
-                            <td data-label="Acciones"><button class="btn btn-sm" style="color:var(--danger);" onclick="deleteEgreso(${e.id})"><i data-lucide="trash"></i></button></td>
+                            <td data-label="Fecha">
+                                <p style="font-weight:600; color:var(--text-main); font-size:0.85rem;">${UI.formatDate(e.date).split(',')[0]}</p>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">${UI.formatDate(e.date).split(',')[1] || ''}</p>
+                            </td>
+                            <td data-label="Concepto">
+                                <p style="font-weight:700; color:var(--text-main);">${e.category}</p>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">${e.description}</p>
+                            </td>
+                            <td data-label="Monto USD">
+                                <p class="text-price" style="font-weight:700;">${UI.formatUSD(e.amountUSD)}</p>
+                            </td>
+                            <td data-label="Monto Bs.">
+                                <p class="text-price" style="color:var(--danger); font-weight:800;">${UI.formatCurrency(e.amountBS)}</p>
+                            </td>
+                            <td data-label="Tasa">
+                                <p style="font-size:0.8rem; color:var(--text-muted);">Bs. ${e.bcvRate.toFixed(2)}</p>
+                            </td>
+                            <td data-label="Acciones" style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end; gap:6px;">
+                                    <button class="btn btn-outline btn-sm" onclick="deleteEgreso(${e.id})" style="color:var(--danger);" title="Eliminar">
+                                        <i data-lucide="trash-2" style="width:14px;"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     `).join('') : '<tr><td colspan="6" style="text-align:center; padding:32px;">No se han registrado egresos aún.</td></tr>'}
                 </tbody>
@@ -1016,6 +1074,7 @@ function renderEgresos() {
         </div>
     `;
     lucide.createIcons();
+    UI.paginateTable('egresos-list', 15);
 }
 
 function showAddEgresoModal() {

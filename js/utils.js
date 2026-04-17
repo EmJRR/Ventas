@@ -68,16 +68,23 @@ const UI = {
         });
     },
 
-    // Search table utility
+    // Paginación y Filtrado
     searchTable: (inputId, tableId) => {
         const input = document.getElementById(inputId);
+        if (!input) return;
         const filter = input.value.toUpperCase();
-        const table = document.getElementById(tableId);
-        const tr = table.getElementsByTagName("tr");
+        const element = document.getElementById(tableId);
+        if (!element) return;
 
-        for (let i = 1; i < tr.length; i++) {
+        const tbody = element.tagName === 'TBODY' ? element : element.querySelector('tbody');
+        if (!tbody) return;
+        const tr = tbody.getElementsByTagName("tr");
+
+        for (let i = 0; i < tr.length; i++) {
             let found = false;
             const tdArray = tr[i].getElementsByTagName("td");
+            if (tdArray.length === 1 && tdArray[0].colSpan > 1) continue; // Saltar placeholder
+
             for (let j = 0; j < tdArray.length; j++) {
                 if (tdArray[j]) {
                     const txtValue = tdArray[j].textContent || tdArray[j].innerText;
@@ -87,8 +94,73 @@ const UI = {
                     }
                 }
             }
-            tr[i].style.display = found ? "" : "none";
+            if (found) {
+                tr[i].classList.remove('search-hidden');
+            } else {
+                tr[i].classList.add('search-hidden');
+            }
         }
+
+        element.dataset.currentPage = 1;
+        if (element.dataset.paginate === 'true') {
+            UI.paginateTable(tableId, parseInt(element.dataset.itemsPerPage) || 15);
+        } else {
+            for (let i = 0; i < tr.length; i++) {
+                tr[i].style.display = tr[i].classList.contains('search-hidden') ? 'none' : '';
+            }
+        }
+    },
+
+    paginateTable: (tableId, itemsPerPage = 15) => {
+        const element = document.getElementById(tableId);
+        if (!element) return;
+
+        const tbody = element.tagName === 'TBODY' ? element : element.querySelector('tbody');
+        if (!tbody) return;
+
+        element.dataset.paginate = 'true';
+        element.dataset.itemsPerPage = itemsPerPage;
+
+        let paginationContainer = element.tagName === 'TBODY' ? element.parentElement.nextElementSibling : element.nextElementSibling;
+
+        if (!paginationContainer || !paginationContainer.classList.contains('pagination-controls')) {
+            paginationContainer = document.createElement('div');
+            paginationContainer.className = 'pagination-controls';
+            paginationContainer.style.cssText = 'display:flex; justify-content:center; gap:8px; margin-top:16px; padding-bottom:16px; align-items:center; flex-wrap:wrap;';
+            const insertAfterNode = element.tagName === 'TBODY' ? element.parentElement : element;
+            insertAfterNode.parentNode.insertBefore(paginationContainer, insertAfterNode.nextSibling);
+        }
+
+        element.dataset.currentPage = element.dataset.currentPage || 1;
+        let currentPage = parseInt(element.dataset.currentPage);
+
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+        const dataRows = rows.filter(r => !(r.cells.length === 1 && r.cells[0].colSpan > 1));
+        const visibleRows = dataRows.filter(r => !r.classList.contains('search-hidden'));
+
+        const totalPages = Math.ceil(visibleRows.length / itemsPerPage) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        element.dataset.currentPage = currentPage;
+
+        dataRows.forEach(r => r.style.display = 'none'); // Esconder todo internamente
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const pageRows = visibleRows.slice(startIndex, Math.min(startIndex + itemsPerPage, visibleRows.length));
+        pageRows.forEach(r => r.style.display = ''); // Mostrar página
+
+        paginationContainer.innerHTML = `
+            <button class="btn btn-outline btn-sm" ${currentPage === 1 ? 'disabled style="opacity:0.5"' : `onclick="UI.changePage('${tableId}', -1)"`}>« Anterior</button>
+            <span style="font-size:0.85rem; font-weight:800; color:var(--primary); background:var(--border-color); padding:6px 16px; border-radius:12px;">Página ${currentPage} de ${totalPages}</span>
+            <button class="btn btn-outline btn-sm" ${currentPage === totalPages ? 'disabled style="opacity:0.5"' : `onclick="UI.changePage('${tableId}', 1)"`}>Siguiente »</button>
+        `;
+    },
+
+    changePage: (tableId, dir) => {
+        const element = document.getElementById(tableId);
+        if (!element) return;
+        let p = parseInt(element.dataset.currentPage) || 1;
+        element.dataset.currentPage = p + dir;
+        UI.paginateTable(tableId, parseInt(element.dataset.itemsPerPage) || 15);
     }
 };
 
@@ -166,6 +238,8 @@ async function fetchDollarRate() {
         dolarValueSpan.textContent = 'Error al cargar';
     }
 }
+
+
 
 // Ejecutar la función al cargar la página
 document.addEventListener('DOMContentLoaded', fetchDollarRate);

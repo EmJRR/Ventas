@@ -1,140 +1,56 @@
 [
   {
-    "id": 1776294880731,
-    "date": "2026-04-15T23:14:40.731Z",
+    "id": 1776451900871,
+    "date": "2026-04-17T18:51:40.871Z",
+    "type": "sistema",
+    "message": "Restauración de backup aplicada: 2026-04-17T18:50:49.806Z"
+  },
+  {
+    "id": 1776452146344,
+    "date": "2026-04-17T18:55:46.344Z",
     "type": "sistema",
     "message": "Backup automático diario generado"
   },
   {
-    "id": 1776295330806,
-    "date": "2026-04-15T23:22:10.806Z",
+    "id": 1776453609962,
+    "date": "2026-04-17T19:20:09.962Z",
     "type": "inventario",
-    "message": "Nuevo producto agregado: PRODUCTO TEST AUDITORIA"
+    "message": "Nuevo producto agregado: das "
   },
   {
-    "id": 1776295355418,
-    "date": "2026-04-15T23:22:35.418Z",
-    "type": "inventario",
-    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA"
-  },
-  {
-    "id": 1776295394879,
-    "date": "2026-04-15T23:23:14.879Z",
+    "id": 1776453616093,
+    "date": "2026-04-17T19:20:16.093Z",
     "type": "venta",
-    "message": "Venta registrada por Bs.S 5.742,97 ($12.00)"
+    "message": "Venta registrada por Bs.S 39.765,30 ($82.80)"
   },
   {
-    "id": 1776282391896,
-    "date": "2026-04-15T19:46:31.896Z",
+    "id": 1776453630581,
+    "date": "2026-04-17T19:20:30.581Z",
     "type": "cliente",
-    "message": "Nuevo cliente registrado: Perez"
+    "message": "Nuevo cliente registrado: Juan "
   },
   {
-    "id": 1776282435702,
-    "date": "2026-04-15T19:47:15.702Z",
+    "id": 1776453645021,
+    "date": "2026-04-17T19:20:45.021Z",
     "type": "venta",
-    "message": "Venta registrada por Bs.S 5.742,97 ($12.00)"
+    "message": "Venta registrada por Bs.S 26.510,20 ($55.20)"
   },
   {
-    "id": 1776296868648,
-    "date": "2026-04-15T23:47:48.648Z",
-    "type": "cliente",
-    "message": "Nuevo cliente registrado: Juan"
-  },
-  {
-    "id": 1776296883715,
-    "date": "2026-04-15T23:48:03.715Z",
+    "id": 1776454376502,
+    "date": "2026-04-17T19:32:56.502Z",
     "type": "venta",
-    "message": "Venta registrada por Bs.S 34.457,84 ($72.00)"
+    "message": "Venta registrada por Bs.S 66.275,49 ($138.00)"
   },
   {
-    "id": 1776285809946,
-    "date": "2026-04-15T20:43:29.946Z",
-    "type": "cliente",
-    "message": "Nuevo cliente registrado: Sara "
-  },
-  {
-    "id": 1776285825599,
-    "date": "2026-04-15T20:43:45.599Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 2.160,00 ($48.00)"
-  },
-  {
-    "id": 1776351156104,
-    "date": "2026-04-16T14:52:36.104Z",
-    "type": "sistema",
-    "message": "Backup automático diario generado"
-  },
-  {
-    "id": 1776366129585,
-    "date": "2026-04-16T19:02:09.585Z",
-    "type": "sistema",
-    "message": "Backup automático diario generado"
-  },
-  {
-    "id": 1776367148992,
-    "date": "2026-04-16T19:19:08.992Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 1.080,00 ($24.00)"
-  },
-  {
-    "id": 1776367866404,
-    "date": "2026-04-16T19:31:06.404Z",
-    "type": "sistema",
-    "message": "Backup automático diario generado"
-  },
-  {
-    "id": 1776367882515,
-    "date": "2026-04-16T19:31:22.515Z",
+    "id": 1776454388017,
+    "date": "2026-04-17T19:33:08.017Z",
     "type": "abono",
-    "message": "Abono de Bs.S 1.000,00 de Perez. Deuda restante: Bs.S 4.742,97 "
+    "message": "Abono de Bs.S 20.000,00 de Juan. Deuda restante: Bs.S 6.510,20 "
   },
   {
-    "id": 1776368398139,
-    "date": "2026-04-16T19:39:58.139Z",
-    "type": "abono",
-    "message": "Abono de Bs.S 4.742,97 de Perez. Deuda restante: Bs.S 0,00 "
-  },
-  {
-    "id": 1776383935439,
-    "date": "2026-04-16T23:58:55.439Z",
+    "id": 1776454613709,
+    "date": "2026-04-17T19:36:53.709Z",
     "type": "sistema",
     "message": "Backup automático diario generado"
-  },
-  {
-    "id": 1776447043285,
-    "date": "2026-04-17T17:30:43.285Z",
-    "type": "inventario",
-    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
-  },
-  {
-    "id": 1776447102100,
-    "date": "2026-04-17T17:31:42.100Z",
-    "type": "inventario",
-    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
-  },
-  {
-    "id": 1776447111540,
-    "date": "2026-04-17T17:31:51.540Z",
-    "type": "inventario",
-    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
-  },
-  {
-    "id": 1776447128484,
-    "date": "2026-04-17T17:32:08.484Z",
-    "type": "inventario",
-    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
-  },
-  {
-    "id": 1776447152668,
-    "date": "2026-04-17T17:32:32.668Z",
-    "type": "inventario",
-    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA "
-  },
-  {
-    "id": 1776450374240,
-    "date": "2026-04-17T18:26:14.240Z",
-    "type": "sistema",
-    "message": "REINICIO TOTAL DEL SISTEMA - Se eliminaron todos los registros"
   }
 ]

@@ -1,122 +1,74 @@
 [
   {
-    "id": 1776295394878,
-    "date": "2026-04-15T23:23:14.878Z",
+    "id": 1776453616093,
+    "date": "2026-04-17T19:20:16.093Z",
     "clientId": 0,
     "items": [
       {
-        "id": 1776295330737,
-        "name": "PRODUCTO TEST AUDITORIA",
-        "qty": 1,
-        "priceUSD": 12,
-        "costUSD": 10
+        "id": 1776453609957,
+        "name": "das",
+        "qty": 3,
+        "priceUSD": 27.6,
+        "costUSD": 23
       }
     ],
-    "totalUSD": 12,
-    "totalBS": 5742.9732,
+    "totalUSD": 82.80000000000001,
+    "totalBS": 39765.296160000005,
     "paymentMethods": {
-      "movil": 0,
+      "movil": 39765.3,
       "debito": 0,
-      "cashUSD": 12,
+      "cashUSD": 0,
       "debt": 0
     },
     "paymentType": "completo",
-    "bcvRate": 478.5811
+    "bcvRate": 480.2572
   },
   {
-    "id": 1776282435701,
-    "date": "2026-04-15T19:47:15.701Z",
-    "clientId": 1776282391896,
+    "id": 1776453645020,
+    "date": "2026-04-17T19:20:45.020Z",
+    "clientId": 1776453630581,
     "items": [
       {
-        "id": 1776295330737,
-        "name": "PRODUCTO TEST AUDITORIA",
-        "qty": 1,
-        "priceUSD": 12,
-        "costUSD": 10
-      }
-    ],
-    "totalUSD": 12,
-    "totalBS": 5742.9732,
-    "paymentMethods": {
-      "movil": 0,
-      "debito": 0,
-      "cashUSD": 0,
-      "debt": 5742.97
-    },
-    "paymentType": "mixto/deuda",
-    "bcvRate": 478.5811
-  },
-  {
-    "id": 1776296883715,
-    "date": "2026-04-15T23:48:03.715Z",
-    "clientId": 1776296868648,
-    "items": [
-      {
-        "id": 1776295330737,
-        "name": "PRODUCTO TEST AUDITORIA",
-        "qty": 6,
-        "priceUSD": 12,
-        "costUSD": 10
-      }
-    ],
-    "totalUSD": 72,
-    "totalBS": 34457.8392,
-    "paymentMethods": {
-      "movil": 0,
-      "debito": 0,
-      "cashUSD": 0,
-      "debt": 34457.84
-    },
-    "paymentType": "mixto/deuda",
-    "bcvRate": 478.5811
-  },
-  {
-    "id": 1776285825599,
-    "date": "2026-04-15T20:43:45.599Z",
-    "clientId": 1776285809946,
-    "items": [
-      {
-        "id": 1776295330737,
-        "name": "PRODUCTO TEST AUDITORIA",
-        "qty": 4,
-        "priceUSD": 12,
-        "costUSD": 10
-      }
-    ],
-    "totalUSD": 48,
-    "totalBS": 2160,
-    "paymentMethods": {
-      "movil": 0,
-      "debito": 0,
-      "cashUSD": 0,
-      "debt": 2160
-    },
-    "paymentType": "mixto/deuda",
-    "bcvRate": 45
-  },
-  {
-    "id": 1776367148992,
-    "date": "2026-04-16T19:19:08.992Z",
-    "clientId": 0,
-    "items": [
-      {
-        "id": 1776295330737,
-        "name": "PRODUCTO TEST AUDITORIA",
+        "id": 1776453609957,
+        "name": "das",
         "qty": 2,
-        "priceUSD": 12,
-        "costUSD": 10
+        "priceUSD": 27.6,
+        "costUSD": 23
       }
     ],
-    "totalUSD": 24,
-    "totalBS": 1080,
+    "totalUSD": 55.2,
+    "totalBS": 26510.197440000004,
     "paymentMethods": {
       "movil": 0,
-      "debito": 1080,
+      "debito": 0,
+      "cashUSD": 0,
+      "debt": 26510.2
+    },
+    "paymentType": "mixto/deuda",
+    "bcvRate": 480.2572
+  },
+  {
+    "id": 1776454376501,
+    "date": "2026-04-17T19:32:56.501Z",
+    "clientId": 0,
+    "items": [
+      {
+        "id": 1776453609957,
+        "name": "das",
+        "qty": 5,
+        "priceUSD": 27.6,
+        "costUSD": 23
+      }
+    ],
+    "totalUSD": 138,
+    "totalBS": 66275.4936,
+    "paymentMethods": {
+      "movil": 66275.49,
+      "debito": 0,
       "cashUSD": 0,
       "debt": 0
     },
     "paymentType": "completo",
-    "bcvRate": 45
+    "bcvRate": 480.2572
   }
 ]
