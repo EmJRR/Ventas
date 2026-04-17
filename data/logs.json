@@ -1,0 +1,104 @@
+[
+  {
+    "id": 1776294880731,
+    "date": "2026-04-15T23:14:40.731Z",
+    "type": "sistema",
+    "message": "Backup automático diario generado"
+  },
+  {
+    "id": 1776295330806,
+    "date": "2026-04-15T23:22:10.806Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: PRODUCTO TEST AUDITORIA"
+  },
+  {
+    "id": 1776295355418,
+    "date": "2026-04-15T23:22:35.418Z",
+    "type": "inventario",
+    "message": "Producto actualizado: PRODUCTO TEST AUDITORIA"
+  },
+  {
+    "id": 1776295394879,
+    "date": "2026-04-15T23:23:14.879Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 5.742,97 ($12.00)"
+  },
+  {
+    "id": 1776282391896,
+    "date": "2026-04-15T19:46:31.896Z",
+    "type": "cliente",
+    "message": "Nuevo cliente registrado: Perez"
+  },
+  {
+    "id": 1776282435702,
+    "date": "2026-04-15T19:47:15.702Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 5.742,97 ($12.00)"
+  },
+  {
+    "id": 1776296868648,
+    "date": "2026-04-15T23:47:48.648Z",
+    "type": "cliente",
+    "message": "Nuevo cliente registrado: Juan"
+  },
+  {
+    "id": 1776296883715,
+    "date": "2026-04-15T23:48:03.715Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 34.457,84 ($72.00)"
+  },
+  {
+    "id": 1776285809946,
+    "date": "2026-04-15T20:43:29.946Z",
+    "type": "cliente",
+    "message": "Nuevo cliente registrado: Sara "
+  },
+  {
+    "id": 1776285825599,
+    "date": "2026-04-15T20:43:45.599Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 2.160,00 ($48.00)"
+  },
+  {
+    "id": 1776351156104,
+    "date": "2026-04-16T14:52:36.104Z",
+    "type": "sistema",
+    "message": "Backup automático diario generado"
+  },
+  {
+    "id": 1776366129585,
+    "date": "2026-04-16T19:02:09.585Z",
+    "type": "sistema",
+    "message": "Backup automático diario generado"
+  },
+  {
+    "id": 1776367148992,
+    "date": "2026-04-16T19:19:08.992Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 1.080,00 ($24.00)"
+  },
+  {
+    "id": 1776367866404,
+    "date": "2026-04-16T19:31:06.404Z",
+    "type": "sistema",
+    "message": "Backup automático diario generado"
+  },
+  {
+    "id": 1776367882515,
+    "date": "2026-04-16T19:31:22.515Z",
+    "type": "abono",
+    "message": "Abono de Bs.S 1.000,00 de Perez. Deuda restante: Bs.S 4.742,97 "
+  },
+  {
+    "id": 1776368398139,
+    "date": "2026-04-16T19:39:58.139Z",
+    "type": "abono",
+    "message": "Abono de Bs.S 4.742,97 de Perez. Deuda restante: Bs.S 0,00 "
+  },
+  {
+    "id": 1776383935439,
+    "date": "2026-04-16T23:58:55.439Z",
+    "type": "sistema",
+    "message": "Backup automático diario generado"
+  }
+]

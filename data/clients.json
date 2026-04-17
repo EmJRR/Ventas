@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1776282391896,
+    "name": "Perez",
+    "phone": "638163",
+    "email": "",
+    "address": "",
+    "debt": 0,
+    "createdAt": "2026-04-15T19:46:31.896Z"
+  },
+  {
+    "id": 1776296868648,
+    "name": "Juan",
+    "phone": "31218",
+    "email": "",
+    "address": "",
+    "debt": 34457.84,
+    "createdAt": "2026-04-15T23:47:48.648Z"
+  },
+  {
+    "id": 1776285809946,
+    "name": "Sara",
+    "phone": "",
+    "email": "",
+    "address": "",
+    "debt": 2160,
+    "createdAt": "2026-04-15T20:43:29.946Z"
+  }
+]

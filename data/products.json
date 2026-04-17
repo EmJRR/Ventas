@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1776295330737,
+    "code": "AUDIT001",
+    "name": "PRODUCTO TEST AUDITORIA",
+    "costUSD": 10,
+    "profitMargin": 20,
+    "priceUSD": 12,
+    "stock": 82
+  }
+]

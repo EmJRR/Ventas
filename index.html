@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SoluVentas | Premium Sales & Inventory</title>
+    <meta name="description"
+        content="Sistema integral de ventas, inventario y gestión de deudas con diseño ejecutivo Glassmorphic.">
+    <!-- Google Fonts: Manrope & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <!-- Modales (Asegurado en el root del body) -->
+    <div id="modal-container" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Título del Modal</h3>
+                <button class="close-modal" onclick="UI.closeModal()">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-content">
+                <!-- Contenido dinámico del modal -->
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="shield-check"></i>
+                    <span style="color: black">SoluVentas</span>
+                </div>
+                <button class="mobile-close" id="mobile-close">
+                    <i data-lucide="chevron-left"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                    <i data-lucide="layout-grid"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#ventas" class="nav-link" data-section="ventas">
+                    <i data-lucide="shopping-bag"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="#inventario" class="nav-link" data-section="inventario">
+                    <i data-lucide="package"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="#deudas" class="nav-link" data-section="deudas">
+                    <i data-lucide="wallet"></i>
+                    <span>Gestión de Deudas</span>
+                </a>
+                <a href="#historial" class="nav-link" data-section="historial">
+                    <i data-lucide="clipboard-list"></i>
+                    <span>Historial</span>
+                </a>
+                <a href="#egresos" class="nav-link" data-section="egresos">
+                    <i data-lucide="trending-down"></i>
+                    <span>Egresos</span>
+                </a>
+                <a href="#clientes" class="nav-link" data-section="clientes">
+                    <i data-lucide="users"></i>
+                    <span>Clientes</span>
+                </a>
+                <a href="#auditoria" class="nav-link" data-section="auditoria">
+                    <i data-lucide="fingerprint"></i>
+                    <span>Auditoría</span>
+                </a>
+                <a href="#configuracion" class="nav-link" data-section="configuracion">
+                    <i data-lucide="settings"></i>
+                    <span>Configuración</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="exchange-rate-card" id="bcv-container">
+                    <div class="rate-header">
+                        <span>Tasa BCV Hoy</span>
+                        <div class="rate-actions">
+                            <button class="rate-btn" id="refresh-bcv" title="Refrescar tasa"><i data-lucide="refresh-cw"></i></button>
+                            <button class="rate-btn" id="manual-bcv" title="Editar manual"><i data-lucide="edit-2"></i></button>
+                        </div>
+                    </div>
+                    <div class="rate-value" id="bcv-value">---</div>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">AD</div>
+                    <div class="user-info">
+                        <p class="name">Admin</p>
+                        <p class="role">Online Sync</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <button class="mobile-toggle" id="mobile-toggle">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="top-bar-title">
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="top-bar-actions mobile-hidden">
+                    <!-- Actions shown only on desktop header -->
+                    <span id="header-date"
+                        style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;"></span>
+                </div>
+            </header>
+
+            <section id="content-area" class="content-area section-fadeIn">
+                <!-- Secciones dinámicas -->
+                <div id="loader" class="loader-container">
+                    <div class="spinner"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Nav for Mobile -->
+        <nav class="bottom-nav glass-nav">
+            <a href="#dashboard" class="bottom-nav-link active" data-section="dashboard">
+                <i data-lucide="layout-grid"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="#ventas" class="bottom-nav-link" data-section="ventas">
+                <div class="nav-plus-icon"><i data-lucide="plus"></i></div>
+                <span>Vender</span>
+            </a>
+            <a href="#inventario" class="bottom-nav-link" data-section="inventario">
+                <i data-lucide="package"></i>
+                <span>Stock</span>
+            </a>
+            <a href="#deudas" class="bottom-nav-link" data-section="deudas">
+                <i data-lucide="wallet"></i>
+                <span>Deudas</span>
+            </a>
+            <a href="javascript:void(0)" class="bottom-nav-link" id="mobile-more">
+                <i data-lucide="more-horizontal"></i>
+                <span>Más</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Toasts Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
