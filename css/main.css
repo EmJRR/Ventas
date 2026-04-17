@@ -82,7 +82,7 @@ h4,
     flex-direction: column;
     position: fixed;
     height: 100vh;
-    z-index: 1000;
+    z-index: 10000; /* Por encima del indicador del dólar */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
 }
@@ -638,6 +638,9 @@ h4,
 
 /* --- Responsiveness for Mobile --- */
 @media (max-width: 1024px) {
+    :root {
+        --sidebar-width: 250px; /* Reducido de 280px */
+    }
     .sidebar {
         transform: translateX(-100%);
     }
@@ -648,7 +651,7 @@ h4,
 
     .main-content {
         margin-left: 0;
-        padding-bottom: calc(var(--bottom-nav-height) + 20px);
+        padding-bottom: calc(var(--bottom-nav-height) + 60px); /* Más espacio para evitar que la barra tape contenido */
     }
 
     .bottom-nav {
@@ -778,8 +781,8 @@ select:focus {
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 9999 !important;
-    /* Estar por encima de TODO */
+    z-index: 11000 !important;
+    /* Estar por encima del sidebar y el dólar */
     padding: 20px;
     animation: fadeIn 0.25s ease-out;
 }
@@ -1218,76 +1221,135 @@ select:focus {
     position: fixed;
     top: 10px;
     right: 10px;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    padding: 8px 15px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(12px);
+    padding: 6px 16px;
     border-radius: 30px;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 700;
     color: white;
-    z-index: 9999;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 9000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Inter', sans-serif;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
 }
 
 .dolar-icon {
-    margin-right: 5px;
+    font-size: 1.1rem;
 }
 
-.dolar-label {
-    margin-right: 5px;
+.dolar-value {
+    font-family: 'Manrope', sans-serif;
+    color: #fff;
+    font-weight: 800;
+}
+
+.dolar-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.btn-icon-tiny {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-icon-tiny:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.btn-icon-tiny:active {
+    transform: scale(0.9);
 }
 
 .dolar-date {
-    font-size: 10px;
-    margin-left: 8px;
-    opacity: 0.8;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
 }
 
 /* ESTILOS PARA MÓVILES */
 @media screen and (max-width: 768px) {
     .dolar-indicator {
         padding: 6px 12px;
-        background: rgba(0, 0, 0, 0.9);
+        top: 20px;
+        right: 20px;
+        min-height: 40px;
     }
 
-    /* Ocultar texto "Dólar BCV:" y la fecha en móviles */
     .dolar-label,
     .dolar-date {
         display: none;
     }
 
-    /* Mostrar solo icono + valor */
-    .dolar-indicator {
-        font-size: 13px;
-        padding: 5px 10px;
+    .dolar-actions {
+        display: none; /* Oculto por defecto en móvil */
+        margin-left: 5px;
     }
 
-    .dolar-icon {
-        margin-right: 4px;
-        font-size: 14px;
-    }
-}
-
-/* Para tablets (opcional - mostrar texto reducido) */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-    .dolar-label {
-        display: inline;
+    .dolar-indicator.expanded {
+        border-radius: 20px;
+        padding-right: 12px;
     }
 
-    .dolar-date {
-        display: none;
-        /* Ocultar fecha en tablets para ahorrar espacio */
+    .dolar-indicator.expanded .dolar-actions {
+        display: flex;
+    }
+    
+    .mobile-only {
+        display: flex !important;
     }
 }
 
-/* Efecto hover en desktop */
 @media screen and (min-width: 769px) {
-    .dolar-indicator:hover {
-        transform: translateY(-2px);
-        background: rgba(0, 0, 0, 0.95);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+/* Optimizaciones para Auditoría */
+.audit-week-group {
+    margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+    .audit-week-group {
+        margin-bottom: 16px;
+    }
+    
+    .audit-timeline .premium-table tr {
+        padding: 12px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .audit-timeline .premium-table td {
+        padding: 8px 0 !important;
+        font-size: 0.85rem !important;
+        min-height: auto !important;
     }
 }

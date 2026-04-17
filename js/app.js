@@ -90,13 +90,13 @@ async function restoreBackup(file) {
         UI.showToast('Selecciona un archivo primero', 'warning');
         return;
     }
-    
+
     const reader = new FileReader();
     reader.onload = async (e) => {
         try {
             const data = JSON.parse(e.target.result);
             if (!data.products || !data.sales) throw new Error('Formato inválido');
-            
+
             const backupDate = data.timestamp ? new Date(data.timestamp).toLocaleDateString() : 'fecha desconocida';
             if (!confirm(`¿Restaurar backup del ${backupDate}?\n¡ATENCIÓN! Se borrarán todos los datos actuales y se reemplazarán por los del respaldo.`)) return;
 
@@ -121,7 +121,7 @@ async function restoreBackup(file) {
 
             // Sincronizar TODO al servidor y localStorage
             const success = await saveAll();
-            
+
             if (success) {
                 UI.showToast('Backup restaurado y sincronizado correctamente', 'success');
                 setTimeout(() => location.reload(), 1500);
@@ -187,9 +187,9 @@ async function startScan(targetId, isQuickAdd) {
 
         const html5QrCode = new Html5Qrcode("reader");
         window.html5QrCode = html5QrCode;
-        
-        const config = { 
-            fps: 10, 
+
+        const config = {
+            fps: 10,
             qrbox: (viewWidth, viewHeight) => {
                 const width = Math.min(viewWidth * 0.8, 300);
                 const height = Math.min(viewHeight * 0.5, 150);
@@ -249,7 +249,7 @@ function stopScanAndRestore() {
     }
 }
 
-UI.stopScanning = function() {
+UI.stopScanning = function () {
     stopScanAndRestore();
 }
 
@@ -410,10 +410,10 @@ function exportLogsCSV() {
 function renderDashboard() {
     const totalSalesBS = sales.reduce((acc, s) => acc + (s.totalBS || 0), 0);
     const totalSalesUSD = currentBCVRate > 0 ? (totalSalesBS / currentBCVRate) : 0;
-    
+
     const totalDebt = clients.reduce((acc, c) => acc + c.debt, 0);
     const totalDebtUSD = currentBCVRate > 0 ? (totalDebt / currentBCVRate) : 0;
-    
+
     const clientCount = clients.length;
 
     contentArea.innerHTML = `
@@ -2273,9 +2273,13 @@ function renderConfiguracion() {
                         <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Dirección</label>
                         <input type="text" id="cfg-biz-addr" value="${settings.businessAddress || ''}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
                     </div>
-                    <div style="grid-column:1/-1;">
+                    <div style="grid-column: 1 / 2;">
                         <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Umbral de Stock Bajo (unidades)</label>
-                        <input type="number" id="cfg-stock-threshold" value="${settings.lowStockThreshold || 5}" min="0" style="width:200px; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+                        <input type="number" id="cfg-stock-threshold" value="${settings.lowStockThreshold || 5}" min="0" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+                    </div>
+                    <div style="grid-column: 2 / 3;">
+                        <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Tasa del Dólar Actual (Manual)</label>
+                        <input type="number" step="0.01" id="cfg-manual-bcv" value="${currentBCVRate.toFixed(2)}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
                     </div>
                     <div style="grid-column:1/-1;">
                         <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Guardar Configuración</button>
@@ -2329,6 +2333,22 @@ function saveBusinessSettings() {
     settings.businessPhone = document.getElementById('cfg-biz-phone').value;
     settings.businessAddress = document.getElementById('cfg-biz-addr').value;
     settings.lowStockThreshold = parseInt(document.getElementById('cfg-stock-threshold').value) || 5;
+
+    // Actualización manual del dólar
+    const manualRate = parseFloat(document.getElementById('cfg-manual-bcv').value);
+    if (!isNaN(manualRate) && manualRate > 0) {
+        currentBCVRate = manualRate;
+        localStorage.setItem('soluventas_manual_bcv', manualRate);
+
+        // Actualizar indicador en la interfaz (intentar ambos posibles IDs para compatibilidad)
+        const valueEl = document.getElementById('bcv-value') || document.getElementById('dolar-value');
+        if (valueEl) {
+            valueEl.innerText = `Bs.${currentBCVRate.toFixed(2)}`;
+            valueEl.style.color = '#fff';
+        }
+        addLog('tasa', `Tasa BCV actualizada manualmente vía configuración a Bs.${manualRate.toFixed(2)}`);
+    }
+
     saveAll();
     UI.showToast('Configuración guardada');
 }
@@ -2386,7 +2406,7 @@ async function fetchBCVRate() {
 function showManualRateModal() {
     const currentValue = document.getElementById('bcv-value').innerText.replace('Bs. ', '');
     UI.openModal("Actualización Manual de Tasa BCV", `
-        < div style = "padding:16px 0;" >
+        <div style="padding:16px 0;">
             <label style="display:block; margin-bottom:8px;">Ingresa el valor del dólar actual:</label>
             <input type="number" id="manual-rate-input" step="0.01" value="${currentValue === '--,--' ? '' : currentValue}" 
                 style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:1.2rem;">
@@ -2421,8 +2441,27 @@ const spinStyle = document.createElement('style');
 spinStyle.textContent = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } .spinning { animation: spin 1s linear infinite; } `;
 document.head.appendChild(spinStyle);
 
-document.getElementById('refresh-bcv').addEventListener('click', fetchBCVRate);
-document.getElementById('manual-bcv').addEventListener('click', showManualRateModal);
+document.getElementById('refresh-bcv').addEventListener('click', (e) => {
+    e.stopPropagation();
+    fetchBCVRate();
+});
+
+document.getElementById('manual-bcv').addEventListener('click', (e) => {
+    e.stopPropagation();
+    showManualRateModal();
+});
+
+// Toggle para móvil
+document.getElementById('dolar-indicator').addEventListener('click', function() {
+    if (window.innerWidth <= 768) {
+        this.classList.add('expanded');
+    }
+});
+
+document.getElementById('close-dolar-actions').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('dolar-indicator').classList.remove('expanded');
+});
 
 // No se necesita el listener de 'load' redundante que causa condiciones de carrera
 // El inicio se maneja exclusivamente por bootstrapApp en DOMContentLoaded

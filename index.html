@@ -30,9 +30,22 @@
 <body>
     <!-- Indicador del Dólar - Flotante en esquina superior derecha -->
     <div id="dolar-indicator" class="dolar-indicator">
-        <span class="dolar-icon">💵</span>
-        <span class="dolar-label">Dólar BCV:</span>
-        <span id="dolar-value" class="dolar-value">Cargando...</span>
+        <div id="dolar-info" style="display: flex; align-items: center; gap: 8px;">
+            <span class="dolar-icon">💵</span>
+            <span class="dolar-label">Dólar BCV:</span>
+            <span id="bcv-value" class="dolar-value">Cargando...</span>
+        </div>
+        <div id="dolar-actions" class="dolar-actions">
+            <button id="refresh-bcv" class="btn-icon-tiny" title="Refrescar API">
+                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+            </button>
+            <button id="manual-bcv" class="btn-icon-tiny" title="Ajuste Manual">
+                <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+            </button>
+            <button id="close-dolar-actions" class="btn-icon-tiny mobile-only" title="Cerrar">
+                <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+            </button>
+        </div>
         <span id="dolar-date" class="dolar-date"></span>
     </div>
     <!-- Modales (Asegurado en el root del body) -->

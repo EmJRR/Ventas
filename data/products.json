@@ -1,11 +1,20 @@
 [
   {
-    "id": 1776453609957,
-    "code": "231",
-    "name": "das",
-    "costUSD": 23,
+    "id": 1776450601255,
+    "code": "Prod, Otro cidgo",
+    "name": "Producto1",
+    "costUSD": 1,
     "profitMargin": 20,
-    "priceUSD": 27.6,
-    "stock": 0
+    "priceUSD": 1.2,
+    "stock": 30
+  },
+  {
+    "id": 1776460052329,
+    "code": "AUDIT001, PERRO",
+    "name": "Producto1",
+    "costUSD": 80,
+    "profitMargin": 20,
+    "priceUSD": 96,
+    "stock": 5
   }
 ]
