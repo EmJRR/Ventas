@@ -59,33 +59,44 @@ const UI = {
             style: 'currency',
             currency: 'USD',
             minimumFractionDigits: 2
-        }).format(amount).replace('USD', '$');
+        }).format(amount);
     },
 
-    // Formateo dinámico para inputs (Máscara)
+    // Formateo dinámico para inputs (Máscara intuitiva: punto de miles, coma decimal)
     maskCurrency: (input) => {
         if (!input) return;
         input.addEventListener('input', (e) => {
-            // Eliminar todo lo que no sea número
-            let value = e.target.value.replace(/\D/g, "");
-            if (value === "") {
-                e.target.value = "";
-                return;
+            const el = e.target;
+            const cursorPos = el.selectionStart;
+            const prevLen = el.value.length;
+
+            // Solo dígitos y la primera coma
+            let raw = el.value.replace(/[^\d,]/g, '');
+
+            // Separar parte entera y decimal por la primera coma
+            const commaIdx = raw.indexOf(',');
+            let intStr, decStr;
+            if (commaIdx >= 0) {
+                intStr = raw.slice(0, commaIdx);
+                decStr = raw.slice(commaIdx + 1).replace(/,/g, '').slice(0, 2);
+            } else {
+                intStr = raw;
+                decStr = null;
             }
-            // Tratarlo como entero de centavos (ej: 100 -> 1,00)
-            let numericValue = (parseInt(value, 10) / 100).toFixed(2);
-            
-            // Formatear con estilo local (punto miles, coma decimal)
-            const parts = numericValue.split('.');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            e.target.value = parts.join(',');
-        });
-        
-        // Evitar que entren letras o caracteres especiales
-        input.addEventListener('keydown', (e) => {
-            if (!/[\d\b\t]|Arrow|Backspace|Delete|Tab/.test(e.key) && !e.ctrlKey) {
-                // e.preventDefault(); // Comentado para permitir navegación, la máscara limpia en 'input'
-            }
+
+            // Quitar ceros al inicio, pero dejar al menos un "0"
+            intStr = intStr.replace(/^0+(\d)/, '$1') || (intStr.length ? '0' : '');
+
+            // Aplicar separadores de miles
+            const intFormatted = intStr.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            // Resultado final
+            el.value = decStr !== null ? intFormatted + ',' + decStr : intFormatted;
+
+            // Restaurar cursor de forma aproximada
+            const newLen = el.value.length;
+            const diff = newLen - prevLen;
+            el.setSelectionRange(cursorPos + diff, cursorPos + diff);
         });
     },
 

@@ -1517,8 +1517,8 @@ function updatePaymentBalance(totalToPay, bcv) {
     const finishBtn = document.getElementById('btn-finish-payment');
 
     if (balance > 0.05) {
-        balanceText.innerText = "Bs. " + balance.toFixed(2);
-        balanceUSD.innerText = "$ " + (balance / bcv).toFixed(2);
+        balanceText.innerText = UI.formatCurrency(balance);
+        balanceUSD.innerText = UI.formatUSD(balance / bcv);
         balanceText.style.color = "var(--primary)";
         if (summaryBox) {
             summaryBox.style.borderColor = "var(--border-color)";
@@ -1527,8 +1527,8 @@ function updatePaymentBalance(totalToPay, bcv) {
         finishBtn.style.opacity = "0.5";
         finishBtn.innerText = "Falta cubrir el total...";
     } else if (balance < -0.05) {
-        balanceText.innerText = "Sobra: Bs. " + Math.abs(balance).toFixed(2);
-        balanceUSD.innerText = "Cambio: $ " + (Math.abs(balance) / bcv).toFixed(2);
+        balanceText.innerText = "Sobra: " + UI.formatCurrency(Math.abs(balance));
+        balanceUSD.innerText = "Cambio: " + UI.formatUSD(Math.abs(balance) / bcv);
         balanceText.style.color = "var(--success)";
         if (summaryBox) {
             summaryBox.style.borderColor = "var(--success)";
@@ -1741,60 +1741,133 @@ function deleteProduct(id) {
 // --- Debt Actions ---
 function showAbonoModal(clientId) {
     const client = clients.find(c => c.id == clientId);
-    const debtUSD = client.debt / currentBCVRate;
-    UI.openModal(`Registrar Abono - ${client.name} `, `
-        <div style="background:var(--bg-main); padding:15px; border-radius:10px; margin-bottom:15px; text-align:center;">
-            <p style="font-size:0.8rem; color:var(--text-muted);">DEUDA TOTAL</p>
-            <p style="font-size:1.4rem; font-weight:800; color:var(--danger);">${UI.formatCurrency(client.debt)}</p>
-            <p style="font-size:0.9rem; color:var(--text-muted);">${UI.formatUSD(debtUSD)}</p>
-        </div>
-        <div>
-            <label style="font-weight:600; font-size:0.9rem;">Monto a abonar (Bs.)</label>
-            <input type="text" id="abono-amount" class="currency-input" placeholder="0,00" 
-                style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:1.1rem; margin-top:5px;"
-                oninput="document.getElementById('abono-usd-ref').innerText = '≈ ' + UI.formatUSD(UI.parseCurrency(this.value) / currentBCVRate)">
-            <p id="abono-usd-ref" style="font-size:0.8rem; color:var(--primary); margin-top:5px; font-weight:600;">≈ $0.00</p>
-        </div>
-        <div style="margin-top:15px;">
-            <label style="font-weight:600; font-size:0.9rem; margin-bottom:5px; display:block;">Método de Pago</label>
-            <select id="abono-method" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:1rem;">
-                <option value="Pago Móvil">Pago Móvil</option>
-                <option value="Débito">Débito</option>
-                <option value="Efectivo ($)">Efectivo ($)</option>
-            </select>
-        </div>
-        <button class="btn btn-primary" style="width:100%; margin-top:20px; height:50px; font-weight:700;" onclick="saveAbono(${clientId})">Confirmar Abono</button>
-    `);
-}
-
-function saveAbono(clientId) {
-    const amount = UI.parseCurrency(document.getElementById('abono-amount').value);
-    const method = document.getElementById('abono-method').value;
-    const client = clients.find(c => c.id == clientId);
-
-    if (isNaN(amount) || amount <= 0 || amount > client.debt + 0.1) {
-        UI.showToast("Monto inválido o excede la deuda", "error");
+    if (!client || client.debt <= 0) {
+        UI.showToast("El cliente no tiene deudas pendientes", "info");
         return;
     }
 
-    const finalAmount = Math.min(amount, client.debt);
-    client.debt -= finalAmount;
+    const totalToPay = client.debt;
+    const debtUSD = totalToPay / currentBCVRate;
+
+    const html = `
+        <div style="margin-bottom:16px;">
+            <p><strong>Cliente:</strong> ${client.name}</p>
+        </div>
+        
+        <div id="abono-summary" style="background:var(--bg-main); padding:20px; border-radius:12px; margin-bottom:20px; text-align:center; border:2px dashed var(--border-color);">
+             <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">SALDO PENDIENTE TRAS ABONO</div>
+             <div id="abono-balance-text" style="font-size:2rem; font-weight:800; color:var(--danger);">${UI.formatCurrency(totalToPay)}</div>
+             <div id="abono-balance-usd" style="font-size:0.9rem; color:var(--text-muted);">${UI.formatUSD(debtUSD)}</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+            <div class="pay-field">
+                <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Pago Móvil (Bs.)</label>
+                <input type="text" id="abono-pay-movil" class="currency-input pay-input" placeholder="0,00" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem;" oninput="updateAbonoBalance(${totalToPay}, ${currentBCVRate})">
+            </div>
+            <div class="pay-field">
+                <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Débito (Bs.)</label>
+                <input type="text" id="abono-pay-debito" class="currency-input pay-input" placeholder="0,00" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem;" oninput="updateAbonoBalance(${totalToPay}, ${currentBCVRate})">
+            </div>
+            <div class="pay-field">
+                <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Efectivo ($)</label>
+                <input type="number" id="abono-pay-cash" class="pay-input" step="0.01" min="0" placeholder="0.00" style="width:100%; padding:12px; border:2px solid var(--success); border-radius:10px; font-size:1.1rem;" oninput="updateAbonoBalance(${totalToPay}, ${currentBCVRate})">
+                <p id="abono-cash-bs-ref" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">≈ Bs. 0,00</p>
+            </div>
+            <div class="pay-field" style="display:flex; align-items:flex-end;">
+                 <button class="btn btn-outline btn-sm" style="width:100%; height:46px;" onclick="fillAbonoExact(${totalToPay})">Abono Exacto</button>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="btn-finish-abono" style="width:100%; height:55px; font-size:1.1rem; font-weight:700;" onclick="saveAbonoMixed(${clientId})">Confirmar Abono(s)</button>
+    `;
+
+    UI.openModal("Registrar Abono - Detalle", html);
+}
+
+function updateAbonoBalance(debtTotal, bcv) {
+    const movil = UI.parseCurrency(document.getElementById('abono-pay-movil').value);
+    const debito = UI.parseCurrency(document.getElementById('abono-pay-debito').value);
+    // El campo de dolares acepta USD directamente (sin mascara de centavos)
+    const cashUSD = parseFloat(document.getElementById('abono-pay-cash').value) || 0;
+    const cashBS = cashUSD * bcv;
+
+    // Mostrar equivalente en Bs bajo el campo de dolares
+    const cashBsRef = document.getElementById('abono-cash-bs-ref');
+    if (cashBsRef) cashBsRef.innerText = '≈ ' + UI.formatCurrency(cashBS);
+
+    const totalPaid = movil + debito + cashBS;
+    const remaining = debtTotal - totalPaid;
+
+    const balanceText = document.getElementById('abono-balance-text');
+    const balanceUSD = document.getElementById('abono-balance-usd');
+    const summaryBox = document.getElementById('abono-summary');
+    const finishBtn = document.getElementById('btn-finish-abono');
+
+    if (remaining > 0.01) {
+        balanceText.innerText = UI.formatCurrency(remaining);
+        balanceUSD.innerText = UI.formatUSD(remaining / bcv);
+        balanceText.style.color = "var(--danger)";
+        summaryBox.style.borderColor = "var(--border-color)";
+        finishBtn.style.opacity = "1";
+        finishBtn.innerText = "Registrar Abono Parcial";
+    } else if (remaining < -0.05) {
+        balanceText.innerText = "Sobra: " + UI.formatCurrency(Math.abs(remaining));
+        balanceUSD.innerText = "Cambio: " + UI.formatUSD(Math.abs(remaining) / bcv);
+        balanceText.style.color = "var(--success)";
+        summaryBox.style.borderColor = "var(--success)";
+        finishBtn.style.opacity = "1";
+        finishBtn.innerText = "Finalizar (Deuda Pagada)";
+    } else {
+        balanceText.innerText = "💰 DEUDA CUBIERTA";
+        balanceUSD.innerText = "Total Pagado";
+        balanceText.style.color = "#16a34a";
+        summaryBox.style.borderColor = "#16a34a";
+        summaryBox.style.background = "#f0fdf4";
+        finishBtn.style.opacity = "1";
+        finishBtn.innerText = "Finalizar (Deuda Pagada)";
+    }
+}
+
+function fillAbonoExact(total) {
+    const input = document.getElementById('abono-pay-movil');
+    const parts = total.toFixed(2).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    input.value = parts.join(',');
+    updateAbonoBalance(total, currentBCVRate);
+}
+
+function saveAbonoMixed(clientId) {
+    const movil = UI.parseCurrency(document.getElementById('abono-pay-movil').value);
+    const debito = UI.parseCurrency(document.getElementById('abono-pay-debito').value);
+    // El campo de dolares es type="number", se lee directamente con parseFloat
+    const cashUSD = parseFloat(document.getElementById('abono-pay-cash').value) || 0;
     
-    payments.push({
-        id: Date.now(),
-        clientId: clientId,
-        amount: finalAmount,
-        method: method,
-        bcvRate: currentBCVRate,
-        date: new Date().toISOString()
-    });
+    const totalAbonado = movil + debito + (cashUSD * currentBCVRate);
+    const client = clients.find(c => c.id == clientId);
+
+    if (totalAbonado <= 0) {
+        UI.showToast("Por favor ingrese algún monto", "error");
+        return;
+    }
+
+    // Descontar de la deuda (nunca dejar deuda negativa)
+    const effectiveAbono = Math.min(totalAbonado, client.debt);
+    client.debt -= effectiveAbono;
+
+    // Registrar los pagos realizados
+    const now = new Date().toISOString();
+    if (movil > 0) payments.push({ id: Date.now() + 1, clientId, amount: movil, method: 'Pago Móvil', bcvRate: currentBCVRate, date: now });
+    if (debito > 0) payments.push({ id: Date.now() + 2, clientId, amount: debito, method: 'Débito', bcvRate: currentBCVRate, date: now });
+    if (cashUSD > 0) payments.push({ id: Date.now() + 3, clientId, amount: cashUSD * currentBCVRate, method: 'Efectivo ($)', bcvRate: currentBCVRate, date: now });
 
     saveAll();
-    addLog('abono', `Abono de ${UI.formatCurrency(finalAmount)} (${method}) de ${client.name}. Deuda restante: ${UI.formatCurrency(client.debt)} `);
+    addLog('abono', `Abonos por total de ${UI.formatCurrency(effectiveAbono)} para ${client.name}. Deuda restante: ${UI.formatCurrency(client.debt)}`);
+    
     UI.closeModal();
     renderDeudas();
     if (window.location.hash === '#historial') filterHistorialByDate();
-    UI.showToast("Abono procesado correctamente");
+    UI.showToast("Abono(s) procesado(s) correctamente");
 }
 
 // --- Clients Actions ---
@@ -1916,12 +1989,15 @@ function viewClientHistory(clientId) {
                 <table class="responsive-table-modal" style="width:100%;">
                     <thead><tr><th>Fecha</th><th>Monto Abonado</th></tr></thead>
                     <tbody>
-                        ${clientPayments.slice().reverse().map(p => `
+                        ${clientPayments.slice().reverse().map(p => {
+                            const isUSD = p.method?.includes('$') || p.method?.toLowerCase().includes('dolar');
+                            const formattedAmount = isUSD ? UI.formatUSD(p.amount / (p.bcvRate || currentBCVRate)) : UI.formatCurrency(p.amount);
+                            return `
                             <tr>
                                 <td data-label="Fecha" style="font-size:0.8rem;">${UI.formatDate(p.date)}</td>
-                                <td data-label="Abono" style="color:var(--success); font-weight:700;">${UI.formatCurrency(p.amount)}</td>
+                                <td data-label="Abono" style="color:var(--success); font-weight:700;">${formattedAmount}</td>
                             </tr>
-                        `).join('')}
+                        `}).join('')}
                     </tbody>
                 </table>
             </div>
@@ -2459,11 +2535,12 @@ async function fetchBCVRate() {
 }
 
 function showManualRateModal() {
-    const currentValue = document.getElementById('bcv-value').innerText.replace('Bs.', '').trim();
+    // Aseguramos que el valor actual se pase con el formato de la máscara (coma decimal)
+    const currentValue = currentBCVRate.toFixed(2).replace('.', ',');
     UI.openModal("Actualización Manual de Tasa BCV", `
         <div style="padding:16px 0;">
             <label style="display:block; margin-bottom:8px;">Ingresa el valor del dólar actual:</label>
-            <input type="text" id="manual-rate-input" class="currency-input" value="${currentValue === '--,--' ? '' : currentValue}" 
+            <input type="text" id="manual-rate-input" class="currency-input" value="${currentValue}" 
                 style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:1.2rem;">
             <p style="font-size:0.8rem; color:var(--text-muted); margin-top:12px;">Se usará este valor manualmente hasta que refresques con la API.</p>
         </div>
