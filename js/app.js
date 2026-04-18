@@ -1478,19 +1478,19 @@ function showConfirmSaleModal(primaryType) {
         <div id="payment-methods-container" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
             <div class="pay-field">
                 <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Pago Móvil (Bs.)</label>
-                <input type="number" id="pay-movil" class="pay-input" value="${fill.movil.toFixed(2)}" step="0.01" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem;" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
+                <input type="text" id="pay-movil" class="currency-input pay-input" value="${fill.movil.toFixed(2).replace('.', ',')}" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem;" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
             </div>
             <div class="pay-field">
                 <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Débito (Bs.)</label>
-                <input type="number" id="pay-debito" class="pay-input" value="${fill.debito.toFixed(2)}" step="0.01" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem;" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
+                <input type="text" id="pay-debito" class="currency-input pay-input" value="${fill.debito.toFixed(2).replace('.', ',')}" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem;" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
             </div>
             <div class="pay-field">
                 <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Efectivo ($)</label>
-                <input type="number" id="pay-cash" class="pay-input" value="${fill.cash.toFixed(2)}" step="0.01" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem; border-color:var(--success);" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
+                <input type="text" id="pay-cash" class="currency-input pay-input" value="${fill.cash.toFixed(2).replace('.', ',')}" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem; border-color:var(--success);" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
             </div>
             <div class="pay-field">
                 <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Deuda / Crédito (Bs.)</label>
-                <input type="number" id="pay-debt" class="pay-input" value="${fill.debt.toFixed(2)}" step="0.01" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem; border-color:var(--danger);" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
+                <input type="text" id="pay-debt" class="currency-input pay-input" value="${fill.debt.toFixed(2).replace('.', ',')}" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem; border-color:var(--danger);" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
             </div>
         </div>
 
@@ -1502,11 +1502,11 @@ function showConfirmSaleModal(primaryType) {
 }
 
 function updatePaymentBalance(totalToPay, bcv) {
-    const movil = parseFloat(document.getElementById('pay-movil').value) || 0;
-    const debito = parseFloat(document.getElementById('pay-debito').value) || 0;
-    const cashUSD = parseFloat(document.getElementById('pay-cash').value) || 0;
+    const movil = UI.parseCurrency(document.getElementById('pay-movil').value);
+    const debito = UI.parseCurrency(document.getElementById('pay-debito').value);
+    const cashUSD = UI.parseCurrency(document.getElementById('pay-cash').value);
     const cashBS = cashUSD * bcv;
-    const debt = parseFloat(document.getElementById('pay-debt').value) || 0;
+    const debt = UI.parseCurrency(document.getElementById('pay-debt').value);
 
     const paid = movil + debito + cashBS + debt;
     const balance = totalToPay - paid;
@@ -1553,10 +1553,10 @@ function completeSale(targetTotalBS) {
     const clientId = parseInt(document.getElementById('sale-client').value);
 
     // Payments amounts
-    const payMovil = parseFloat(document.getElementById('pay-movil').value) || 0;
-    const payDebito = parseFloat(document.getElementById('pay-debito').value) || 0;
-    const payCashUSD = parseFloat(document.getElementById('pay-cash').value) || 0;
-    const payDebt = parseFloat(document.getElementById('pay-debt').value) || 0;
+    const payMovil = UI.parseCurrency(document.getElementById('pay-movil').value);
+    const payDebito = UI.parseCurrency(document.getElementById('pay-debito').value);
+    const payCashUSD = UI.parseCurrency(document.getElementById('pay-cash').value);
+    const payDebt = UI.parseCurrency(document.getElementById('pay-debt').value);
 
     const totalPaidBS = payMovil + payDebito + (payCashUSD * currentBCVRate) + payDebt;
 
@@ -1643,9 +1643,9 @@ function showAddProductModal() {
                     </div>
                 </div>
                 <div style="margin-bottom:12px; grid-column: 1 / -1;"> <label>Nombre del Producto</label><input type="text" id="p-name" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="number" step="0.01" id="p-cost" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="text" id="p-cost" class="currency-input" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>% Ganancia</label><input type="number" id="p-margin" value="20" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>Venta ($)</label><input type="number" step="0.01" id="p-price" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
+                <div style="margin-bottom:12px;"> <label>Venta ($)</label><input type="text" id="p-price" class="currency-input" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
                 <div style="margin-bottom:12px;"> <label>Stock Inicial</label><input type="number" id="p-stock" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px; height:50px; font-weight:700;">Guardar Producto</button>
@@ -1655,10 +1655,14 @@ function showAddProductModal() {
 }
 
 function calculatePriceUSD() {
-    const cost = parseFloat(document.getElementById('p-cost').value) || 0;
+    const cost = UI.parseCurrency(document.getElementById('p-cost').value);
     const margin = parseFloat(document.getElementById('p-margin').value) || 0;
     const price = cost + (cost * (margin / 100));
-    document.getElementById('p-price').value = price.toFixed(2);
+    
+    // Formateo manual para el campo readonly ya que la máscara no actúa en cambios por JS
+    const parts = price.toFixed(2).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    document.getElementById('p-price').value = parts.join(',');
 }
 
 function saveProduct() {
@@ -1666,9 +1670,9 @@ function saveProduct() {
         id: Date.now(),
         code: document.getElementById('p-code').value,
         name: document.getElementById('p-name').value,
-        costUSD: parseFloat(document.getElementById('p-cost').value),
+        costUSD: UI.parseCurrency(document.getElementById('p-cost').value),
         profitMargin: parseFloat(document.getElementById('p-margin').value),
-        priceUSD: parseFloat(document.getElementById('p-price').value),
+        priceUSD: UI.parseCurrency(document.getElementById('p-price').value),
         stock: parseInt(document.getElementById('p-stock').value)
     };
     products.push(newP);
@@ -1697,9 +1701,9 @@ function showEditProductModal(id) {
                     </div>
                 </div>
                 <div style="margin-bottom:12px; grid-column: 1 / -1;"> <label>Nombre</label><input type="text" id="p-name" value="${p.name}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="number" step="0.01" id="p-cost" value="${p.costUSD || p.priceUSD}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="text" id="p-cost" class="currency-input" value="${(p.costUSD || 0).toFixed(2).replace('.', ',')}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>% Ganancia</label><input type="number" id="p-margin" value="${p.profitMargin || 20}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
-                <div style="margin-bottom:12px;"> <label>Precio Venta ($)</label><input type="number" step="0.01" id="p-price" value="${p.priceUSD}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
+                <div style="margin-bottom:12px;"> <label>Precio Venta ($)</label><input type="text" id="p-price" class="currency-input" value="${(p.priceUSD || 0).toFixed(2).replace('.', ',')}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
                 <div style="margin-bottom:12px;"> <label>Stock</label><input type="number" id="p-stock" value="${p.stock}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px;">Actualizar Producto</button>
@@ -1712,9 +1716,9 @@ function updateProduct(id) {
     const p = products.find(prod => prod.id == id);
     p.code = document.getElementById('p-code').value;
     p.name = document.getElementById('p-name').value;
-    p.costUSD = parseFloat(document.getElementById('p-cost').value);
+    p.costUSD = UI.parseCurrency(document.getElementById('p-cost').value);
     p.profitMargin = parseFloat(document.getElementById('p-margin').value);
-    p.priceUSD = parseFloat(document.getElementById('p-price').value);
+    p.priceUSD = UI.parseCurrency(document.getElementById('p-price').value);
     p.stock = parseInt(document.getElementById('p-stock').value);
 
     saveAll();
@@ -1746,38 +1750,50 @@ function showAbonoModal(clientId) {
         </div>
         <div>
             <label style="font-weight:600; font-size:0.9rem;">Monto a abonar (Bs.)</label>
-            <input type="number" id="abono-amount" step="0.01" max="${client.debt}" placeholder="0.00" 
+            <input type="text" id="abono-amount" class="currency-input" placeholder="0,00" 
                 style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:1.1rem; margin-top:5px;"
-                oninput="document.getElementById('abono-usd-ref').innerText = '≈ ' + UI.formatUSD(this.value / currentBCVRate)">
+                oninput="document.getElementById('abono-usd-ref').innerText = '≈ ' + UI.formatUSD(UI.parseCurrency(this.value) / currentBCVRate)">
             <p id="abono-usd-ref" style="font-size:0.8rem; color:var(--primary); margin-top:5px; font-weight:600;">≈ $0.00</p>
+        </div>
+        <div style="margin-top:15px;">
+            <label style="font-weight:600; font-size:0.9rem; margin-bottom:5px; display:block;">Método de Pago</label>
+            <select id="abono-method" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:1rem;">
+                <option value="Pago Móvil">Pago Móvil</option>
+                <option value="Débito">Débito</option>
+                <option value="Efectivo ($)">Efectivo ($)</option>
+            </select>
         </div>
         <button class="btn btn-primary" style="width:100%; margin-top:20px; height:50px; font-weight:700;" onclick="saveAbono(${clientId})">Confirmar Abono</button>
     `);
 }
 
 function saveAbono(clientId) {
-    const amount = parseFloat(document.getElementById('abono-amount').value);
+    const amount = UI.parseCurrency(document.getElementById('abono-amount').value);
+    const method = document.getElementById('abono-method').value;
     const client = clients.find(c => c.id == clientId);
 
-    if (isNaN(amount) || amount <= 0 || amount > client.debt + 0.01) {
+    if (isNaN(amount) || amount <= 0 || amount > client.debt + 0.1) {
         UI.showToast("Monto inválido o excede la deuda", "error");
         return;
     }
 
-    client.debt -= amount;
+    const finalAmount = Math.min(amount, client.debt);
+    client.debt -= finalAmount;
+    
     payments.push({
         id: Date.now(),
         clientId: clientId,
-        amount: amount,
-        bcvRate: currentBCVRate, // Guardamos la tasa del momento del abono
+        amount: finalAmount,
+        method: method,
+        bcvRate: currentBCVRate,
         date: new Date().toISOString()
     });
 
     saveAll();
-    addLog('abono', `Abono de ${UI.formatCurrency(amount)} de ${client.name}. Deuda restante: ${UI.formatCurrency(client.debt)} `);
+    addLog('abono', `Abono de ${UI.formatCurrency(finalAmount)} (${method}) de ${client.name}. Deuda restante: ${UI.formatCurrency(client.debt)} `);
     UI.closeModal();
     renderDeudas();
-    if (window.location.hash === '#historial') filterHistorialByDate(); // Refrescar si estamos viendo historial
+    if (window.location.hash === '#historial') filterHistorialByDate();
     UI.showToast("Abono procesado correctamente");
 }
 
@@ -1864,7 +1880,7 @@ function viewClientHistory(clientId) {
     const totalPaid = clientPayments.reduce((acc, p) => acc + p.amount, 0);
 
     UI.openModal(`Historial — ${client.name} `, `
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:20px;" >
+        <div class="stats-grid-modal">
             <div style="background:var(--bg-main); padding:12px; border-radius:10px; text-align:center;">
                 <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">COMPRAS</div>
                 <div style="font-size:1.1rem; font-weight:700;">${clientSales.length}</div>
@@ -1879,16 +1895,16 @@ function viewClientHistory(clientId) {
             </div>
         </div>
         <h4 style="margin-bottom:10px; font-size:0.9rem; color:var(--text-muted);">ÚLTIMAS COMPRAS</h4>
-        <div style="max-height:200px; overflow-y:auto; margin-bottom:16px;">
-            <table style="width:100%;">
+        <div style="max-height:300px; overflow-y:auto; margin-bottom:16px;">
+            <table class="responsive-table-modal" style="width:100%;">
                 <thead><tr><th>Fecha</th><th>Total Bs.</th><th>Pago</th><th></th></tr></thead>
                 <tbody>
                     ${clientSales.length > 0 ? clientSales.slice().reverse().slice(0, 10).map(s => `
                         <tr>
-                            <td style="font-size:0.8rem;">${UI.formatDate(s.date)}</td>
-                            <td style="font-weight:700;">${UI.formatCurrency(s.totalBS || 0)}</td>
-                            <td><span class="badge ${s.paymentType?.includes('deud') || s.paymentType?.includes('debt') ? 'bg-danger' : 'bg-success'}">${s.paymentType}</span></td>
-                            <td><button class="btn btn-sm btn-outline" onclick="printTicket(${s.id})"><i data-lucide="printer"></i></button></td>
+                            <td data-label="Fecha" style="font-size:0.8rem;">${UI.formatDate(s.date)}</td>
+                            <td data-label="Monto" style="font-weight:700;">${UI.formatCurrency(s.totalBS || 0)}</td>
+                            <td data-label="Método"><span class="badge ${s.paymentType?.includes('deud') || s.paymentType?.includes('debt') ? 'bg-danger' : 'bg-success'}">${s.paymentType}</span></td>
+                            <td><button class="btn btn-sm btn-outline" onclick="printTicket(${s.id})"><i data-lucide="printer"></i> Ticket</button></td>
                         </tr>
                     `).join('') : '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Sin compras registradas</td></tr>'}
                 </tbody>
@@ -1897,13 +1913,13 @@ function viewClientHistory(clientId) {
         ${clientPayments.length > 0 ? `
             <h4 style="margin-bottom:10px; font-size:0.9rem; color:var(--text-muted);">ABONOS REALIZADOS</h4>
             <div style="max-height:150px; overflow-y:auto;">
-                <table style="width:100%;">
+                <table class="responsive-table-modal" style="width:100%;">
                     <thead><tr><th>Fecha</th><th>Monto Abonado</th></tr></thead>
                     <tbody>
                         ${clientPayments.slice().reverse().map(p => `
                             <tr>
-                                <td style="font-size:0.8rem;">${UI.formatDate(p.date)}</td>
-                                <td style="color:var(--success); font-weight:700;">${UI.formatCurrency(p.amount)}</td>
+                                <td data-label="Fecha" style="font-size:0.8rem;">${UI.formatDate(p.date)}</td>
+                                <td data-label="Abono" style="color:var(--success); font-weight:700;">${UI.formatCurrency(p.amount)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -2256,7 +2272,7 @@ function renderConfiguracion() {
 
             <div class="data-table-container" style="margin-bottom:24px;">
                 <div class="table-header"><h3><i data-lucide="building-2" style="width:18px;"></i> Datos del Negocio</h3></div>
-                <form onsubmit="event.preventDefault(); saveBusinessSettings()" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <form onsubmit="event.preventDefault(); saveBusinessSettings()" class="config-grid">
                     <div>
                         <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Nombre del Negocio</label>
                         <input type="text" id="cfg-biz-name" value="${settings.businessName || 'SoluVentas'}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
@@ -2273,35 +2289,35 @@ function renderConfiguracion() {
                         <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Dirección</label>
                         <input type="text" id="cfg-biz-addr" value="${settings.businessAddress || ''}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
                     </div>
-                    <div style="grid-column: 1 / 2;">
-                        <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Umbral de Stock Bajo (unidades)</label>
+                    <div>
+                        <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Umbral de Stock Bajo</label>
                         <input type="number" id="cfg-stock-threshold" value="${settings.lowStockThreshold || 5}" min="0" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
                     </div>
-                    <div style="grid-column: 2 / 3;">
-                        <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Tasa del Dólar Actual (Manual)</label>
-                        <input type="number" step="0.01" id="cfg-manual-bcv" value="${currentBCVRate.toFixed(2)}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+                    <div>
+                        <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Tasa Manual</label>
+                        <input type="text" id="cfg-manual-bcv" class="currency-input" value="${currentBCVRate.toFixed(2).replace('.', ',')}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
                     </div>
                     <div style="grid-column:1/-1;">
-                        <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Guardar Configuración</button>
+                        <button type="submit" class="btn btn-primary" style="width:100%;"><i data-lucide="save"></i> Guardar Configuración</button>
                     </div>
                 </form>
             </div>
 
             <div class="data-table-container" style="margin-bottom:24px;">
                 <div class="table-header"><h3><i data-lucide="database" style="width:18px;"></i> Backup y Restauración</h3></div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="config-grid">
                     <div style="background:var(--bg-main); border-radius:10px; padding:16px;">
-                        <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">Último backup automático</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">Backup automático</div>
                         <div style="font-weight:700; margin-bottom:12px;">${lastBackupText}</div>
-                        <button class="btn btn-primary" onclick="performAutoBackup(true)">
-                            <i data-lucide="download"></i> Descargar Backup Ahora
+                        <button class="btn btn-primary" style="width:100%;" onclick="performAutoBackup(true)">
+                            <i data-lucide="download"></i> Descargar .JSON
                         </button>
                     </div>
                     <div style="background:var(--bg-main); border-radius:10px; padding:16px;">
-                        <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">Restaurar desde archivo .json</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">Restaurar respaldo</div>
                         <input type="file" id="restore-file" accept=".json" style="width:100%; margin-bottom:10px; font-size:0.85rem;">
-                        <button class="btn btn-outline" onclick="restoreBackup(document.getElementById('restore-file').files[0])">
-                            <i data-lucide="upload"></i> Restaurar Backup
+                        <button class="btn btn-outline" style="width:100%;" onclick="restoreBackup(document.getElementById('restore-file').files[0])">
+                            <i data-lucide="upload"></i> Subir Archivo
                         </button>
                     </div>
                 </div>
@@ -2309,22 +2325,20 @@ function renderConfiguracion() {
 
             <div class="data-table-container" style="border:2px solid rgba(239,68,68,0.3)">
                 <div class="table-header"><h3 style="color:var(--danger);"><i data-lucide="alert-triangle" style="width:18px;"></i> Zona de Peligro</h3></div>
-                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">Estas acciones son irreversibles. Realiza un backup antes de proceder.</p>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">Estas acciones son irreversibles.</p>
                 <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="clearAllData()">
-                        <i data-lucide="trash-2"></i> Borrar Todos los Datos
+                    <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); flex:1; min-width:200px;" onclick="clearAllData()">
+                        <i data-lucide="trash-2"></i> Borrar Todo
                     </button>
-                    <button class="btn btn-outline" onclick="exportToCSV()">
-                        <i data-lucide="file-spreadsheet"></i> Exportar Ventas CSV
-                    </button>
-                    <button class="btn btn-outline" onclick="exportLogsCSV()">
-                        <i data-lucide="file-text"></i> Exportar Logs CSV
+                    <button class="btn btn-outline" style="flex:1; min-width:200px;" onclick="exportToCSV()">
+                        <i data-lucide="file-spreadsheet"></i> Exportar Ventas
                     </button>
                 </div>
             </div>
         </div>
         `;
     lucide.createIcons();
+    contentArea.querySelectorAll('.currency-input').forEach(input => UI.maskCurrency(input));
 }
 
 function saveBusinessSettings() {
@@ -2335,7 +2349,7 @@ function saveBusinessSettings() {
     settings.lowStockThreshold = parseInt(document.getElementById('cfg-stock-threshold').value) || 5;
 
     // Actualización manual del dólar
-    const manualRate = parseFloat(document.getElementById('cfg-manual-bcv').value);
+    const manualRate = UI.parseCurrency(document.getElementById('cfg-manual-bcv').value);
     if (!isNaN(manualRate) && manualRate > 0) {
         currentBCVRate = manualRate;
         localStorage.setItem('soluventas_manual_bcv', manualRate);
@@ -2355,18 +2369,59 @@ function saveBusinessSettings() {
 
 // Export CSV
 function exportToCSV() {
-    let csv = "Fecha,Cliente,Total USD,Total BS,Metodo\n";
+    // Totales acumulados por caja
+    const cumulativeTotals = {
+        movil: 0,
+        debito: 0,
+        cashUSD: 0,
+        debt: 0
+    };
+    let totalGlobalUSD = 0;
+    let totalGlobalBS = 0;
+
+    // Encabezado con BOM y columnas desglosadas
+    let csv = "\uFEFFFecha;Cliente;Total USD;Total BS;Pago Movil (Bs);Debito (Bs);Efectivo ($);Deuda (Bs);Tipo\n";
+    
     sales.forEach(s => {
         const clientName = clients.find(c => c.id == s.clientId)?.name || 'General';
-        csv += `${s.date.split('T')[0]},${clientName},${s.totalUSD || 0},${s.totalBS || 0},${s.paymentType} \n`;
+        const usd = parseFloat(s.totalUSD) || 0;
+        const bs = parseFloat(s.totalBS) || 0;
+        
+        // Extraer montos individuales de los métodos de pago
+        const pm = s.paymentMethods || {};
+        const pMovil = parseFloat(pm.movil) || 0;
+        const pDebito = parseFloat(pm.debito) || 0;
+        const pCash = parseFloat(pm.cashUSD) || 0;
+        const pDebt = parseFloat(pm.debt) || 0;
+
+        // Sumar a los acumuladores globales
+        cumulativeTotals.movil += pMovil;
+        cumulativeTotals.debito += pDebito;
+        cumulativeTotals.cashUSD += pCash;
+        cumulativeTotals.debt += pDebt;
+        totalGlobalUSD += usd;
+        totalGlobalBS += bs;
+
+        csv += `${s.date.split('T')[0]};${clientName};${usd.toFixed(2)};${bs.toFixed(2)};${pMovil.toFixed(2)};${pDebito.toFixed(2)};${pCash.toFixed(2)};${pDebt.toFixed(2)};${s.paymentType}\n`;
     });
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    // Añadir resumen final detallado por cada método de pago
+    csv += "\n\n--- CIERRE DE CAJA POR METODO DE PAGO ---\n";
+    csv += "Metodo;Total Acumulado\n";
+    csv += `PAGO MOVIL;Bs. ${cumulativeTotals.movil.toFixed(2)}\n`;
+    csv += `DEBITO;Bs. ${cumulativeTotals.debito.toFixed(2)}\n`;
+    csv += `DOLARES ($);$ ${cumulativeTotals.cashUSD.toFixed(2)}\n`;
+    csv += `DEUDOR (DEUDA);Bs. ${cumulativeTotals.debt.toFixed(2)}\n`;
+    csv += `\nTOTAL TRANSADO (USD);$ ${totalGlobalUSD.toFixed(2)}\n`;
+    csv += `TOTAL TRANSADO (BS);Bs. ${totalGlobalBS.toFixed(2)}\n`;
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ventas_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `reporte_ventas_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
+    UI.showToast("Reporte detallado exportado");
 }
 
 // BCV Rate Fetching
@@ -2404,11 +2459,11 @@ async function fetchBCVRate() {
 }
 
 function showManualRateModal() {
-    const currentValue = document.getElementById('bcv-value').innerText.replace('Bs. ', '');
+    const currentValue = document.getElementById('bcv-value').innerText.replace('Bs.', '').trim();
     UI.openModal("Actualización Manual de Tasa BCV", `
         <div style="padding:16px 0;">
             <label style="display:block; margin-bottom:8px;">Ingresa el valor del dólar actual:</label>
-            <input type="number" id="manual-rate-input" step="0.01" value="${currentValue === '--,--' ? '' : currentValue}" 
+            <input type="text" id="manual-rate-input" class="currency-input" value="${currentValue === '--,--' ? '' : currentValue}" 
                 style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); font-size:1.2rem;">
             <p style="font-size:0.8rem; color:var(--text-muted); margin-top:12px;">Se usará este valor manualmente hasta que refresques con la API.</p>
         </div>
@@ -2417,7 +2472,7 @@ function showManualRateModal() {
 }
 
 function saveManualRate() {
-    const val = parseFloat(document.getElementById('manual-rate-input').value);
+    const val = UI.parseCurrency(document.getElementById('manual-rate-input').value);
     if (!isNaN(val) && val > 0) {
         currentBCVRate = val;
         const valueEl = document.getElementById('bcv-value');

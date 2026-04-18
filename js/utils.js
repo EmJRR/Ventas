@@ -33,6 +33,11 @@ const UI = {
         modalTitle.textContent = title;
         modalBody.innerHTML = contentHTML;
         modalContainer.classList.add('active');
+        
+        // Aplicar máscara a campos específicos automáticamente
+        const currencyInputs = modalBody.querySelectorAll('.currency-input');
+        currencyInputs.forEach(input => UI.maskCurrency(input));
+
         lucide.createIcons();
     },
 
@@ -40,13 +45,13 @@ const UI = {
         document.getElementById('modal-container').classList.remove('active');
     },
 
-    // Currency Formatting
+    // Currency Formatting & Input Masking
     formatCurrency: (amount) => {
         return new Intl.NumberFormat('es-VE', {
             style: 'currency',
             currency: 'VES',
             minimumFractionDigits: 2
-        }).format(amount).replace('VES', 'Bs.');
+        }).format(amount).replace('VES', 'Bs. ');
     },
 
     formatUSD: (amount) => {
@@ -54,7 +59,42 @@ const UI = {
             style: 'currency',
             currency: 'USD',
             minimumFractionDigits: 2
-        }).format(amount);
+        }).format(amount).replace('USD', '$');
+    },
+
+    // Formateo dinámico para inputs (Máscara)
+    maskCurrency: (input) => {
+        if (!input) return;
+        input.addEventListener('input', (e) => {
+            // Eliminar todo lo que no sea número
+            let value = e.target.value.replace(/\D/g, "");
+            if (value === "") {
+                e.target.value = "";
+                return;
+            }
+            // Tratarlo como entero de centavos (ej: 100 -> 1,00)
+            let numericValue = (parseInt(value, 10) / 100).toFixed(2);
+            
+            // Formatear con estilo local (punto miles, coma decimal)
+            const parts = numericValue.split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            e.target.value = parts.join(',');
+        });
+        
+        // Evitar que entren letras o caracteres especiales
+        input.addEventListener('keydown', (e) => {
+            if (!/[\d\b\t]|Arrow|Backspace|Delete|Tab/.test(e.key) && !e.ctrlKey) {
+                // e.preventDefault(); // Comentado para permitir navegación, la máscara limpia en 'input'
+            }
+        });
+    },
+
+    // Convertir el texto de la máscara a número procesable
+    parseCurrency: (formattedStr) => {
+        if (!formattedStr || typeof formattedStr !== 'string') return parseFloat(formattedStr) || 0;
+        // Quitar puntos de miles y reemplazar coma por punto decimal
+        const cleanValue = formattedStr.replace(/\./g, '').replace(',', '.');
+        return parseFloat(cleanValue) || 0;
     },
 
     // Date Formatting

@@ -24,6 +24,47 @@
         #scanner-container { border: 2px dashed #6366f1 !important; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 15px; }
         #reader { width: 100% !important; min-height: 250px; background: #000; }
         #reader video { width: 100% !important; height: auto !important; object-fit: cover; }
+
+        /* Mejora para modales en móviles */
+        .stats-grid-modal { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .responsive-table-modal thead { display: table-header-group; }
+        
+        @media (max-width: 600px) {
+            .stats-grid-modal { grid-template-columns: 1fr; }
+            .responsive-table-modal thead { display: none; }
+            .responsive-table-modal tr { 
+                display: flex; 
+                flex-direction: column; 
+                padding: 12px; 
+                background: var(--bg-main); 
+                border-radius: 12px; 
+                margin-bottom: 10px; 
+                position: relative;
+            }
+            .responsive-table-modal td { 
+                display: flex; 
+                justify-content: space-between; 
+                padding: 4px 0; 
+                border: none !important;
+            }
+            .responsive-table-modal td:last-child {
+                justify-content: flex-end;
+                padding-top: 8px;
+                border-top: 1px dashed var(--border-color) !important;
+            }
+            .responsive-table-modal td::before { 
+                content: attr(data-label); 
+                font-weight: 600; 
+                color: var(--text-muted); 
+                font-size: 0.8rem;
+            }
+            .responsive-table-modal td:last-child::before { content: none; }
+        }
+
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) {
+            .config-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 
