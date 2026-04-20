@@ -42,5 +42,30 @@
     "paymentType": "completo",
     "bcvRate": 481.2177,
     "isService": true
+  },
+  {
+    "id": 1776697891272,
+    "date": "2026-04-20T15:11:31.272Z",
+    "clientId": 0,
+    "items": [
+      {
+        "id": 1776697862422,
+        "name": "Tomate",
+        "qty": 0.5,
+        "priceUSD": 1.2,
+        "costUSD": 1
+      }
+    ],
+    "totalUSD": 0.6,
+    "totalBS": 288.73062,
+    "paymentMethods": {
+      "movil": 0,
+      "debito": 0,
+      "efectivo $": 0,
+      "efectivo Bs": 288.73,
+      "debt": 0
+    },
+    "paymentType": "completo",
+    "bcvRate": 481.2177
   }
 ]

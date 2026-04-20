@@ -196,5 +196,15 @@
     "profitMargin": 30,
     "priceUSD": 1.38,
     "stock": 6
+  },
+  {
+    "id": 1776697862422,
+    "code": "34",
+    "name": "Tomate",
+    "costUSD": 1,
+    "profitMargin": 20,
+    "priceUSD": 1.2,
+    "unit": "kg",
+    "stock": 14.9
   }
 ]

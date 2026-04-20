@@ -651,10 +651,10 @@ function renderInventario() {
                                 </div>
                             </td>
                             <td data-label="📊 Stock">
-                                <span style="background: ${p.stock <= settings.lowStockThreshold ? 'rgba(244, 63, 94, 0.15)' : 'rgba(34, 197, 94, 0.15)'}; 
+                                <span style="background: ${p.stock <= (p.unit === 'kg' ? settings.lowStockThreshold : settings.lowStockThreshold) ? 'rgba(244, 63, 94, 0.15)' : 'rgba(34, 197, 94, 0.15)'}; 
                                              color: ${p.stock <= settings.lowStockThreshold ? '#fb7185' : '#34d399'}; 
                                              padding: 4px 12px; border-radius: 8px; font-weight: 700;">
-                                    ${p.stock} u.
+                                    ${p.unit === 'kg' ? p.stock.toFixed(3).replace('.', ',') : p.stock} ${p.unit === 'kg' ? 'kg' : 'u.'}
                                 </span>
                             </td>
                             <td data-label="⚡ Acciones">
@@ -842,7 +842,7 @@ function renderPOSProducts(list) {
             <p style="font-size: 0.7rem; color: var(--text-muted);">${UI.formatCurrency((p.priceUSD || 0) * currentBCVRate)}</p>
             <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size: 0.65rem; padding: 2px 6px; border-radius:4px; background: ${p.stock <= settings.lowStockThreshold ? '#fee2e2' : '#f0fdf4'}; color: ${p.stock <= settings.lowStockThreshold ? '#ef4444' : '#22c55e'}; font-weight:600;">
-                    Stock: ${p.stock}
+                    Stock: ${p.unit === 'kg' ? p.stock.toFixed(3).replace('.', ',') + ' kg' : p.stock + ' u.'}
                 </span>
             </div>
         </div>
@@ -1582,6 +1582,11 @@ function addToCart(productId) {
         return;
     }
 
+    if (product.unit === 'kg') {
+        showWeightModal(product);
+        return;
+    }
+
     const cartItem = cart.find(item => item.id == product.id);
     if (cartItem) {
         if (cartItem.qty >= product.stock) {
@@ -1593,6 +1598,52 @@ function addToCart(productId) {
         cart.push({ ...product, qty: 1 });
     }
     updateCartUI();
+}
+
+function showWeightModal(product) {
+    const html = `
+        <div style="margin-bottom:20px; text-align:center;">
+            <p style="font-size:1.1rem; font-weight:700; color:var(--primary);">${product.name}</p>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Precio: ${UI.formatUSD(product.priceUSD)} / Kg</p>
+        </div>
+        <div style="margin-bottom:24px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:8px;">Peso en Kilogramos (Kg)</label>
+            <input type="number" id="w-weight" step="0.010" min="0.001" placeholder="0,000" autofocus 
+                style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--primary); font-size:1.8rem; text-align:center; font-weight:800; color:var(--text-main);">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px;">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('w-weight').value = 0.250">0.250 kg</button>
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('w-weight').value = 0.500">0.500 kg</button>
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('w-weight').value = 1.000">1.000 kg</button>
+            </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%; height:55px; font-weight:800; font-size:1.1rem;" onclick="confirmWeight(${product.id})">Confirmar Peso</button>
+    `;
+    UI.openModal("⚖️ Ingresar Peso", html);
+    setTimeout(() => document.getElementById('w-weight').focus(), 300);
+}
+
+function confirmWeight(pid) {
+    const weightInput = document.getElementById('w-weight');
+    const weight = parseFloat(weightInput.value);
+    if (isNaN(weight) || weight <= 0) return UI.showToast("Ingrese un peso válido", "error");
+    
+    const product = products.find(p => p.id == pid);
+    if (weight > product.stock) return UI.showToast("Stock insuficiente en inventario", "error");
+
+    const cartItem = cart.find(item => item.id == pid);
+    if (cartItem) {
+        if (cartItem.qty + weight > product.stock) {
+            UI.showToast("La cantidad total supera el stock disponible", "error");
+            return;
+        }
+        cartItem.qty += weight;
+    } else {
+        cart.push({ ...product, qty: weight });
+    }
+    
+    UI.closeModal();
+    updateCartUI();
+    UI.showToast(`Agregado: ${weight.toFixed(3).replace('.', ',')} kg de ${product.name}`);
 }
 
 function updateCartUI() {
@@ -1615,8 +1666,10 @@ function updateCartUI() {
         <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
                 <div>
                     <p style="font-weight:600; font-size:0.9rem;">${item.name}</p>
-                    <p style="font-size:0.8rem; color:var(--text-muted);">${UI.formatUSD(itemPrice)} x ${item.qty} = ${UI.formatUSD(itemPrice * item.qty)}</p>
-                    <p style="font-size:0.75rem; color:var(--primary);">${UI.formatCurrency(itemPrice * item.qty * currentBCVRate)}</p>
+                    <p style="font-size:0.8rem; color:var(--text-muted);">
+                        ${UI.formatUSD(itemPrice)} x ${item.unit === 'kg' ? item.qty.toFixed(3).replace('.', ',') + ' kg' : item.qty + ' u.'} = ${UI.formatUSD(itemPrice * item.qty)}
+                    </p>
+                    <p style="font-size:0.75rem; color:var(--primary); font-weight:700;">${UI.formatCurrency(itemPrice * item.qty * currentBCVRate)}</p>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                      <button class="btn btn-outline btn-sm" onclick="changeQty(${item.id}, -1)">-</button>
@@ -1635,11 +1688,14 @@ function changeQty(id, delta) {
     const item = cart.find(i => i.id == id);
     const product = products.find(p => p.id == id);
     if (item) {
-        const newQty = item.qty + delta;
+        const step = item.unit === 'kg' ? 0.1 : 1;
+        const newQty = item.qty + (delta * step);
         if (newQty > 0 && newQty <= product.stock) {
             item.qty = newQty;
         } else if (newQty > product.stock) {
             UI.showToast("Stock insuficiente", "error");
+        } else if (newQty <= 0) {
+            removeFromCart(id);
         }
     }
     updateCartUI();
@@ -1860,7 +1916,14 @@ function showAddProductModal() {
                 <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="text" id="p-cost" class="currency-input" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>% Ganancia</label><input type="number" id="p-margin" value="20" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Venta ($)</label><input type="text" id="p-price" class="currency-input" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
-                <div style="margin-bottom:12px;"> <label>Stock Inicial</label><input type="number" id="p-stock" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px;"> 
+                    <label>Unidad de Venta</label>
+                    <select id="p-unit" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:white;">
+                        <option value="unid">Unidades (pza, unid)</option>
+                        <option value="kg">Kilogramos (kg, gr)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:12px;"> <label>Stock Inicial</label><input type="number" id="p-stock" step="0.001" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px; height:50px; font-weight:700;">Guardar Producto</button>
         </form>
@@ -1887,7 +1950,8 @@ function saveProduct() {
         costUSD: UI.parseCurrency(document.getElementById('p-cost').value),
         profitMargin: parseFloat(document.getElementById('p-margin').value),
         priceUSD: UI.parseCurrency(document.getElementById('p-price').value),
-        stock: parseInt(document.getElementById('p-stock').value)
+        unit: document.getElementById('p-unit').value,
+        stock: parseFloat(document.getElementById('p-stock').value)
     };
     products.push(newP);
     saveAll();
@@ -1918,7 +1982,14 @@ function showEditProductModal(id) {
                 <div style="margin-bottom:12px;"> <label>Costo ($)</label><input type="text" id="p-cost" class="currency-input" value="${(p.costUSD || 0).toFixed(2).replace('.', ',')}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>% Ganancia</label><input type="number" id="p-margin" value="${p.profitMargin || 20}" required oninput="calculatePriceUSD()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
                 <div style="margin-bottom:12px;"> <label>Precio Venta ($)</label><input type="text" id="p-price" class="currency-input" value="${(p.priceUSD || 0).toFixed(2).replace('.', ',')}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#f1f5f9;" readonly> </div>
-                <div style="margin-bottom:12px;"> <label>Stock</label><input type="number" id="p-stock" value="${p.stock}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
+                <div style="margin-bottom:12px;"> 
+                    <label>Unidad de Venta</label>
+                    <select id="p-unit" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:white;">
+                        <option value="unid" ${p.unit === 'unid' ? 'selected' : ''}>Unidades (pza, unid)</option>
+                        <option value="kg" ${p.unit === 'kg' ? 'selected' : ''}>Kilogramos (kg, gr)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:12px;"> <label>Stock</label><input type="number" id="p-stock" value="${p.stock}" step="0.001" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);"> </div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px;">Actualizar Producto</button>
         </form>
@@ -1933,7 +2004,8 @@ function updateProduct(id) {
     p.costUSD = UI.parseCurrency(document.getElementById('p-cost').value);
     p.profitMargin = parseFloat(document.getElementById('p-margin').value);
     p.priceUSD = UI.parseCurrency(document.getElementById('p-price').value);
-    p.stock = parseInt(document.getElementById('p-stock').value);
+    p.unit = document.getElementById('p-unit').value;
+    p.stock = parseFloat(document.getElementById('p-stock').value);
 
     saveAll();
     addLog('inventario', `Producto actualizado: ${p.name} `);
