@@ -1,1 +1,46 @@
-[]
+[
+  {
+    "id": 1776697301863,
+    "date": "2026-04-20T15:01:41.863Z",
+    "clientId": 0,
+    "items": [
+      {
+        "id": "srv_recarga",
+        "name": "Recarga Telefónica / Otros",
+        "qty": 1,
+        "priceUSD": 0.5195153877340755,
+        "costUSD": 0.46756384896066794
+      }
+    ],
+    "totalUSD": 0.5195153877340755,
+    "totalBS": 250,
+    "paymentMethods": {
+      "movil": 250
+    },
+    "paymentType": "completo",
+    "bcvRate": 481.2177,
+    "isService": true
+  },
+  {
+    "id": 1776697383460,
+    "date": "2026-04-20T15:03:03.460Z",
+    "clientId": 0,
+    "items": [
+      {
+        "id": "srv_avance",
+        "name": "Avance de Efectivo",
+        "qty": 1,
+        "priceUSD": 0.24936738611235623,
+        "costUSD": 0.20780615509363018
+      }
+    ],
+    "totalUSD": 0.24936738611235623,
+    "totalBS": 120,
+    "paymentMethods": {
+      "movil": 120
+    },
+    "paymentType": "completo",
+    "bcvRate": 481.2177,
+    "isService": true
+  }
+]

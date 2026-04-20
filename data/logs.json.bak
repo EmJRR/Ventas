@@ -1,67 +1,175 @@
 [
   {
-    "id": 1776466924776,
-    "date": "2026-04-17T23:02:04.776Z",
+    "id": 1776547264078,
+    "date": "2026-04-18T21:21:04.078Z",
     "type": "inventario",
-    "message": "Nuevo producto agregado: asdads "
+    "message": "Nuevo producto agregado: Cheesetris mediano 150g "
   },
   {
-    "id": 1776466939260,
-    "date": "2026-04-17T23:02:19.260Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 129.093,14 ($268.80)"
-  },
-  {
-    "id": 1776466943273,
-    "date": "2026-04-17T23:02:23.273Z",
-    "type": "cliente",
-    "message": "Nuevo cliente registrado: Kenai "
-  },
-  {
-    "id": 1776466954903,
-    "date": "2026-04-17T23:02:34.903Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 129.093,14 ($268.80)"
-  },
-  {
-    "id": 1776467136990,
-    "date": "2026-04-17T23:05:36.990Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
-  },
-  {
-    "id": 1776467183306,
-    "date": "2026-04-17T23:06:23.306Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
-  },
-  {
-    "id": 1776467195610,
-    "date": "2026-04-17T23:06:35.610Z",
+    "id": 1776547436573,
+    "date": "2026-04-18T21:23:56.573Z",
     "type": "inventario",
-    "message": "Producto actualizado: asdads "
+    "message": "Nuevo producto agregado: Galletas coco crunch "
   },
   {
-    "id": 1776467201585,
-    "date": "2026-04-17T23:06:41.585Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+    "id": 1776547451738,
+    "date": "2026-04-18T21:24:11.738Z",
+    "type": "inventario",
+    "message": "Producto actualizado: Galletas coco crunch "
   },
   {
-    "id": 1776467205052,
-    "date": "2026-04-17T23:06:45.052Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+    "id": 1776547463907,
+    "date": "2026-04-18T21:24:23.907Z",
+    "type": "tasa",
+    "message": "Tasa BCV actualizada manualmente a Bs.483.00 "
   },
   {
-    "id": 1776471703803,
-    "date": "2026-04-18T00:21:43.803Z",
+    "id": 1776547637287,
+    "date": "2026-04-18T21:27:17.287Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Puffy Pepito "
+  },
+  {
+    "id": 1776547867297,
+    "date": "2026-04-18T21:31:07.297Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Toallas hugme de noche moradas "
+  },
+  {
+    "id": 1776548177079,
+    "date": "2026-04-18T21:36:17.079Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Crema alident grande 100g "
+  },
+  {
+    "id": 1776548383264,
+    "date": "2026-04-18T21:39:43.264Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Mayonesa Kraft pequeña "
+  },
+  {
+    "id": 1776548486488,
+    "date": "2026-04-18T21:41:26.488Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Afeitadora Dorco "
+  },
+  {
+    "id": 1776549097262,
+    "date": "2026-04-18T21:51:37.262Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Mantequilla mavesa 250g "
+  },
+  {
+    "id": 1776550178539,
+    "date": "2026-04-18T22:09:38.539Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Sal el campo 1kg "
+  },
+  {
+    "id": 1776550509903,
+    "date": "2026-04-18T22:15:09.903Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Tostones TOM grande 80g "
+  },
+  {
+    "id": 1776550841418,
+    "date": "2026-04-18T22:20:41.418Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Paquete de club social  "
+  },
+  {
+    "id": 1776551006143,
+    "date": "2026-04-18T22:23:26.143Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Galleta club social unidad "
+  },
+  {
+    "id": 1776551207705,
+    "date": "2026-04-18T22:26:47.705Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Salsa de tomate Fregoso pequeña "
+  },
+  {
+    "id": 1776551379728,
+    "date": "2026-04-18T22:29:39.728Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Conflei Maizoritos "
+  },
+  {
+    "id": 1776551727802,
+    "date": "2026-04-18T22:35:27.802Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Sopa maggi  "
+  },
+  {
+    "id": 1776552023490,
+    "date": "2026-04-18T22:40:23.490Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Café amanecer 100g  "
+  },
+  {
+    "id": 1776552242443,
+    "date": "2026-04-18T22:44:02.443Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Café montaña 100g "
+  },
+  {
+    "id": 1776552384169,
+    "date": "2026-04-18T22:46:24.169Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Café montaña 200g "
+  },
+  {
+    "id": 1776552557328,
+    "date": "2026-04-18T22:49:17.328Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Azúcar alvarigua 800g "
+  },
+  {
+    "id": 1776552664107,
+    "date": "2026-04-18T22:51:04.107Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Harina de trigo leudante la pampa 920g "
+  },
+  {
+    "id": 1776553135237,
+    "date": "2026-04-18T22:58:55.237Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: Palitos de chocolate  "
+  },
+  {
+    "id": 1776553260392,
+    "date": "2026-04-18T23:01:00.392Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: De todito pequeño "
+  },
+  {
+    "id": 1776691393243,
+    "date": "2026-04-20T13:23:13.243Z",
+    "type": "sistema",
+    "message": "Restauración de backup aplicada: 18/4/2026"
+  },
+  {
+    "id": 1776695746115,
+    "date": "2026-04-20T14:35:46.115Z",
     "type": "sistema",
     "message": "Backup automático guardado en el servidor"
   },
   {
-    "id": 1776691369106,
-    "date": "2026-04-20T13:22:49.106Z",
+    "id": 1776697301864,
+    "date": "2026-04-20T15:01:41.864Z",
+    "type": "servicio",
+    "message": "Recarga realizada por Bs.S 250,00 (Ganancia: Bs.S 25,00)"
+  },
+  {
+    "id": 1776697383460,
+    "date": "2026-04-20T15:03:03.460Z",
+    "type": "servicio",
+    "message": "Avance de efectivo: Entregado Bs.S 100,00, Cobrado Bs.S 120,00"
+  },
+  {
+    "id": 1776697475122,
+    "date": "2026-04-20T15:04:35.122Z",
     "type": "sistema",
     "message": "Backup automático guardado en el servidor"
   }

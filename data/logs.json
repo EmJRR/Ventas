@@ -148,5 +148,29 @@
     "date": "2026-04-20T13:23:13.243Z",
     "type": "sistema",
     "message": "Restauración de backup aplicada: 18/4/2026"
+  },
+  {
+    "id": 1776695746115,
+    "date": "2026-04-20T14:35:46.115Z",
+    "type": "sistema",
+    "message": "Backup automático guardado en el servidor"
+  },
+  {
+    "id": 1776697301864,
+    "date": "2026-04-20T15:01:41.864Z",
+    "type": "servicio",
+    "message": "Recarga realizada por Bs.S 250,00 (Ganancia: Bs.S 25,00)"
+  },
+  {
+    "id": 1776697383460,
+    "date": "2026-04-20T15:03:03.460Z",
+    "type": "servicio",
+    "message": "Avance de efectivo: Entregado Bs.S 100,00, Cobrado Bs.S 120,00"
+  },
+  {
+    "id": 1776697475126,
+    "date": "2026-04-20T15:04:35.126Z",
+    "type": "sistema",
+    "message": "Backup automático guardado en el servidor"
   }
 ]

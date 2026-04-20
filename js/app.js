@@ -742,7 +742,15 @@ function renderVentas() {
 
             <!-- Carrito y Checkout -->
             <div class="data-table-container" style="display: flex; flex-direction: column;">
-                <div class="table-header" style="padding-top:10px;"><h3>Carrito</h3></div>
+                <div style="padding: 12px; display: flex; gap: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 10px;">
+                    <button class="btn btn-outline btn-sm" onclick="showRecargaModal()" style="flex:1; border-color:var(--primary); color:var(--primary); display:flex; align-items:center; justify-content:center; gap:6px; font-weight:700;">
+                        <i data-lucide="smartphone" style="width:16px;"></i> Recarga
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="showAvanceModal()" style="flex:1; border-color:var(--success); color:var(--success); display:flex; align-items:center; justify-content:center; gap:6px; font-weight:700;">
+                        <i data-lucide="hand-coins" style="width:16px;"></i> Avance
+                    </button>
+                </div>
+                <div class="table-header" style="padding-top:0;"><h3>Carrito</h3></div>
                 
                 <div class="cart-items" id="cart-items-list" style="flex: 1; min-height: 300px; max-height: 500px; overflow-y: auto;">
                     <p style="text-align:center; color:var(--text-muted); padding: 20px;">El carrito está vacío</p>
@@ -772,7 +780,8 @@ function renderVentas() {
                             <button class="btn btn-primary btn-sm" onclick="showConfirmSaleModal('movil')">Pago Móvil</button>
                             <button class="btn btn-secondary btn-sm" onclick="showConfirmSaleModal('debito')">Débito</button>
                             <button class="btn btn-outline btn-sm" onclick="showConfirmSaleModal('cash')">Dólares ($)</button>
-                            <button class="btn btn-success btn-sm" onclick="showConfirmSaleModal('debt')">Deudor (Deuda)</button>
+                            <button class="btn btn-warning btn-sm" onclick="showConfirmSaleModal('cashbs')" style="color:white; background: #f59e0b; border:none;">Efectivo (Bs.)</button>
+                            <button class="btn btn-success btn-sm" onclick="showConfirmSaleModal('debt')" style="grid-column: 1 / -1;">Deudor (Deuda)</button>
                         </div>
                     </div>
                 </div>
@@ -853,6 +862,143 @@ function renderPOSProducts(list) {
     `;
     
     lucide.createIcons();
+}
+
+// --- Servicios Especiales ---
+
+function showRecargaModal() {
+    const html = `
+        <form id="recarga-form" onsubmit="event.preventDefault(); processRecarga()">
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Monto de la Recarga (Bs.)</label>
+                <input type="text" id="r-amount-bs" class="currency-input" required placeholder="0,00" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); font-size:1.1rem;">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Ganancia / Comisión (%)</label>
+                <input type="number" id="r-percentage" value="10" step="0.5" required style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); font-size:1rem;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Método de Pago Recibido</label>
+                <select id="r-method" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); background:white; font-size:1rem; cursor:pointer;">
+                    <option value="movil">Pago Móvil</option>
+                    <option value="debito">Débito</option>
+                    <option value="efectivo $">Efectivo ($)</option>
+                    <option value="efectivo Bs">Efectivo (Bs)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; height:50px; font-weight:700;">Procesar Recarga</button>
+        </form>
+    `;
+    UI.openModal("Servicio de Recarga", html);
+    UI.maskCurrency(document.getElementById('r-amount-bs'));
+}
+
+function processRecarga() {
+    const amountBS = UI.parseCurrency(document.getElementById('r-amount-bs').value);
+    const percentage = parseFloat(document.getElementById('r-percentage').value) || 0;
+    const method = document.getElementById('r-method').value;
+
+    if (amountBS <= 0) return UI.showToast("Monto inválido", "error");
+
+    const profitBS = amountBS * (percentage / 100);
+    const totalUSD = amountBS / currentBCVRate;
+    const profitUSD = profitBS / currentBCVRate;
+    const costUSD = totalUSD - profitUSD;
+
+    const sale = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        clientId: 0,
+        items: [{
+            id: 'srv_recarga',
+            name: 'Recarga Telefónica / Otros',
+            qty: 1,
+            priceUSD: totalUSD,
+            costUSD: costUSD
+        }],
+        totalUSD: totalUSD,
+        totalBS: amountBS,
+        paymentMethods: { [method]: method === 'efectivo $' ? (amountBS / currentBCVRate) : amountBS },
+        paymentType: 'completo',
+        bcvRate: currentBCVRate,
+        isService: true
+    };
+
+    sales.push(sale);
+    addLog('servicio', `Recarga realizada por ${UI.formatCurrency(amountBS)} (Ganancia: ${UI.formatCurrency(profitBS)})`);
+    saveAll();
+    UI.closeModal();
+    UI.showToast("Recarga registrada con éxito", "success");
+    renderSection('ventas');
+}
+
+function showAvanceModal() {
+    const html = `
+        <form id="avance-form" onsubmit="event.preventDefault(); processAvance()">
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Monto a Entregar al Cliente (Bs. Efectivo)</label>
+                <input type="text" id="a-advance-bs" class="currency-input" required placeholder="0,00" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); font-size:1.1rem; color:var(--danger); font-weight:700;">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Comisión a Cobrar (Bs.)</label>
+                <input type="text" id="a-commission-bs" class="currency-input" required placeholder="0,00" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); color:var(--success); font-weight:700; font-size:1.1rem;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Método de Recepción del Dinero</label>
+                <select id="a-method" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); background:white; font-size:1rem; cursor:pointer;">
+                    <option value="movil">Pago Móvil</option>
+                    <option value="debito">Débito</option>
+                    <option value="efectivo $">Efectivo ($)</option>
+                </select>
+                <p style="font-size:0.7rem; color:var(--text-muted); margin-top:8px; line-height:1.4;">
+                    * El sistema registrará el ingreso total (monto + comisión) y descontará el costo (monto entregado) para reflejar la ganancia exacta.
+                </p>
+            </div>
+            <button type="submit" class="btn btn-success" style="width:100%; height:50px; font-weight:700;">Procesar Avance</button>
+        </form>
+    `;
+    UI.openModal("Avance de Efectivo", html);
+    UI.maskCurrency(document.getElementById('a-advance-bs'));
+    UI.maskCurrency(document.getElementById('a-commission-bs'));
+}
+
+function processAvance() {
+    const advanceBS = UI.parseCurrency(document.getElementById('a-advance-bs').value);
+    const commissionBS = UI.parseCurrency(document.getElementById('a-commission-bs').value);
+    const method = document.getElementById('a-method').value;
+
+    if (advanceBS <= 0) return UI.showToast("Monto de avance inválido", "error");
+
+    const totalReceivedBS = advanceBS + commissionBS;
+    const totalUSD = totalReceivedBS / currentBCVRate;
+    const profitUSD = commissionBS / currentBCVRate;
+    const costUSD = advanceBS / currentBCVRate;
+
+    const sale = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        clientId: 0,
+        items: [{
+            id: 'srv_avance',
+            name: 'Avance de Efectivo',
+            qty: 1,
+            priceUSD: totalUSD,
+            costUSD: costUSD
+        }],
+        totalUSD: totalUSD,
+        totalBS: totalReceivedBS,
+        paymentMethods: { [method]: method === 'efectivo $' ? (totalReceivedBS / currentBCVRate) : totalReceivedBS },
+        paymentType: 'completo',
+        bcvRate: currentBCVRate,
+        isService: true
+    };
+
+    sales.push(sale);
+    addLog('servicio', `Avance de efectivo: Entregado ${UI.formatCurrency(advanceBS)}, Cobrado ${UI.formatCurrency(totalReceivedBS)}`);
+    saveAll();
+    UI.closeModal();
+    UI.showToast("Avance registrado con éxito", "success");
+    renderSection('ventas');
 }
 
 // Función para cambiar de página
@@ -1518,8 +1664,9 @@ function showConfirmSaleModal(primaryType) {
     const totalBS = totalUSD * currentBCVRate;
 
     // Pre-fill logic
-    const fill = { movil: 0, debito: 0, cash: 0, debt: 0 };
+    const fill = { movil: 0, debito: 0, cash: 0, cashBS: 0, debt: 0 };
     if (primaryType === 'cash') fill.cash = totalUSD;
+    else if (primaryType === 'cashbs') fill.cashBS = totalBS;
     else if (primaryType === 'debt') fill.debt = totalBS;
     else if (primaryType === 'movil') fill.movil = totalBS;
     else if (primaryType === 'debito') fill.debito = totalBS;
@@ -1549,6 +1696,10 @@ function showConfirmSaleModal(primaryType) {
                 <input type="text" id="pay-cash" class="currency-input pay-input" value="${fill.cash.toFixed(2).replace('.', ',')}" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem; border-color:var(--success);" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
             </div>
             <div class="pay-field">
+                <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Efectivo (Bs.)</label>
+                <input type="text" id="pay-cash-bs" class="currency-input pay-input" value="${fill.cashBS.toFixed(2).replace('.', ',')}" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem; border-color:#f59e0b;" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
+            </div>
+            <div class="pay-field" style="grid-column: 1 / -1;">
                 <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:6px;">Deuda / Crédito (Bs.)</label>
                 <input type="text" id="pay-debt" class="currency-input pay-input" value="${fill.debt.toFixed(2).replace('.', ',')}" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1.1rem; border-color:var(--danger);" oninput="updatePaymentBalance(${totalBS}, ${currentBCVRate})">
             </div>
@@ -1565,10 +1716,11 @@ function updatePaymentBalance(totalToPay, bcv) {
     const movil = UI.parseCurrency(document.getElementById('pay-movil').value);
     const debito = UI.parseCurrency(document.getElementById('pay-debito').value);
     const cashUSD = UI.parseCurrency(document.getElementById('pay-cash').value);
-    const cashBS = cashUSD * bcv;
+    const cashBS = UI.parseCurrency(document.getElementById('pay-cash-bs').value);
+    const cashUSD_inBS = cashUSD * bcv;
     const debt = UI.parseCurrency(document.getElementById('pay-debt').value);
 
-    const paid = movil + debito + cashBS + debt;
+    const paid = movil + debito + cashUSD_inBS + cashBS + debt;
     const balance = totalToPay - paid;
 
     const balanceText = document.getElementById('payment-balance-text');
@@ -1616,9 +1768,10 @@ function completeSale(targetTotalBS) {
     const payMovil = UI.parseCurrency(document.getElementById('pay-movil').value);
     const payDebito = UI.parseCurrency(document.getElementById('pay-debito').value);
     const payCashUSD = UI.parseCurrency(document.getElementById('pay-cash').value);
+    const payCashBS = UI.parseCurrency(document.getElementById('pay-cash-bs').value);
     const payDebt = UI.parseCurrency(document.getElementById('pay-debt').value);
 
-    const totalPaidBS = payMovil + payDebito + (payCashUSD * currentBCVRate) + payDebt;
+    const totalPaidBS = payMovil + payDebito + (payCashUSD * currentBCVRate) + payCashBS + payDebt;
 
     if (totalPaidBS < targetTotalBS - 0.1) {
         UI.showToast("El pago es insuficiente para cubrir el total", "error");
@@ -1653,7 +1806,8 @@ function completeSale(targetTotalBS) {
         paymentMethods: {
             movil: payMovil,
             debito: payDebito,
-            cashUSD: payCashUSD,
+            'efectivo $': payCashUSD,
+            'efectivo Bs': payCashBS,
             debt: payDebt
         },
         paymentType: payDebt > 0 ? 'mixto/deuda' : 'completo',
@@ -2298,7 +2452,8 @@ function viewSaleDetails(saleId) {
                 <h4 style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">MÉTODOS DE PAGO</h4>
                 ${s.paymentMethods.movil > 0 ? `<div style="display:flex; justify-content:space-between; padding:4px 0;"><span>Pago Móvil</span><span>${UI.formatCurrency(s.paymentMethods.movil)}</span></div>` : ''}
                 ${s.paymentMethods.debito > 0 ? `<div style="display:flex; justify-content:space-between; padding:4px 0;"><span>Débito</span><span>${UI.formatCurrency(s.paymentMethods.debito)}</span></div>` : ''}
-                ${s.paymentMethods.cashUSD > 0 ? `<div style="display:flex; justify-content:space-between; padding:4px 0;"><span>Efectivo ($)</span><span>${UI.formatUSD(s.paymentMethods.cashUSD)}</span></div>` : ''}
+                ${(s.paymentMethods.cashUSD > 0 || s.paymentMethods['efectivo $'] > 0) ? `<div style="display:flex; justify-content:space-between; padding:4px 0;"><span>Efectivo ($)</span><span>${UI.formatUSD(s.paymentMethods['efectivo $'] || s.paymentMethods.cashUSD)}</span></div>` : ''}
+                ${s.paymentMethods['efectivo Bs'] > 0 ? `<div style="display:flex; justify-content:space-between; padding:4px 0;"><span>Efectivo (Bs)</span><span>${UI.formatCurrency(s.paymentMethods['efectivo Bs'])}</span></div>` : ''}
                 ${s.paymentMethods.debt > 0 ? `<div style="display:flex; justify-content:space-between; padding:4px 0; color:var(--danger);"><span>Deuda</span><span>${UI.formatCurrency(s.paymentMethods.debt)}</span></div>` : ''}
             </div>
         ` : ''
@@ -2373,7 +2528,8 @@ function printTicket(saleId) {
                 <div style="font-size:10px; margin-bottom:4px; font-weight:bold;">FORMA DE PAGO:</div>
                 ${s.paymentMethods.movil > 0 ? `<div class="row"><span>Pago Móvil:</span><span>Bs. ${s.paymentMethods.movil.toFixed(2)}</span></div>` : ''}
                 ${s.paymentMethods.debito > 0 ? `<div class="row"><span>Débito:</span><span>Bs. ${s.paymentMethods.debito.toFixed(2)}</span></div>` : ''}
-                ${s.paymentMethods.cashUSD > 0 ? `<div class="row"><span>Efectivo ($):</span><span>$${s.paymentMethods.cashUSD.toFixed(2)}</span></div>` : ''}
+                ${(s.paymentMethods.cashUSD > 0 || s.paymentMethods['efectivo $'] > 0) ? `<div class="row"><span>Efectivo ($):</span><span>$${(s.paymentMethods['efectivo $'] || s.paymentMethods.cashUSD).toFixed(2)}</span></div>` : ''}
+                ${s.paymentMethods['efectivo Bs'] > 0 ? `<div class="row"><span>Efectivo (Bs):</span><span>Bs. ${s.paymentMethods['efectivo Bs'].toFixed(2)}</span></div>` : ''}
                 ${s.paymentMethods.debt > 0 ? `<div class="row" style="font-weight:bold;"><span>DEUDA:</span><span>Bs. ${s.paymentMethods.debt.toFixed(2)}</span></div>` : ''}
             ` : ''}
                     <div class="footer">
