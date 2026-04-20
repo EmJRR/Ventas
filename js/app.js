@@ -416,7 +416,8 @@ function renderDashboard() {
     const totalDebt = clients.reduce((acc, c) => acc + c.debt, 0);
     const totalDebtUSD = currentBCVRate > 0 ? (totalDebt / currentBCVRate) : 0;
 
-    const clientCount = clients.length;
+    const totalInvestmentUSD = products.reduce((acc, p) => acc + ((p.costUSD || 0) * (p.stock || 0)), 0);
+    const totalInvestmentBS = totalInvestmentUSD * currentBCVRate;
 
     contentArea.innerHTML = `
         <div class="dashboard-stats">
@@ -437,8 +438,12 @@ function renderDashboard() {
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon blue"><i data-lucide="users"></i></div>
-                <div class="stat-info"><h3>Clientes</h3><p>${clientCount}</p></div>
+                <div class="stat-icon blue"><i data-lucide="briefcase"></i></div>
+                <div class="stat-info">
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">INVERSIÓN TOTAL</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">${UI.formatUSD(totalInvestmentUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalInvestmentBS)}</span>
+                </div>
             </div>
             <div class="stat-card" style="cursor:pointer;" onclick="showLowStockModal()">
                 <div class="stat-icon green"><i data-lucide="package"></i></div>
@@ -1345,29 +1350,32 @@ function filterHistorialByDate() {
 
 // 6. Egresos Logic
 function renderEgresos() {
-    const totalEgresosUSD = egresos.reduce((acc, e) => acc + (e.amountUSD || 0), 0);
-    const totalEgresosBS = egresos.reduce((acc, e) => acc + (e.amountBS || 0), 0);
-
+    const today = new Date().toISOString().split('T')[0];
     contentArea.innerHTML = `
-        <div class="dashboard-stats" style="margin-bottom:24px;">
-            <div class="stat-card">
-                <div class="stat-icon orange"><i data-lucide="minus-circle"></i></div>
-                <div class="stat-info"><h3>Total Egresos USD</h3><p>${UI.formatUSD(totalEgresosUSD)}</p></div>
+        <div class="filter-panel" style="padding:20px; background:var(--bg-surface); border-radius:var(--border-radius-lg); margin-bottom:24px; border:1px solid var(--border-color); display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
+            <div style="flex:1; min-width:140px;">
+                <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; display:block;">Desde</label>
+                <input type="date" id="egreso-date-from" value="${today}" style="width:100%;">
             </div>
-            <div class="stat-card">
-                <div class="stat-icon orange"><i data-lucide="minus-circle"></i></div>
-                <div class="stat-info"><h3>Total Egresos Bs.</h3><p>${UI.formatCurrency(totalEgresosBS)}</p></div>
+            <div style="flex:1; min-width:140px;">
+                <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; display:block;">Hasta</label>
+                <input type="date" id="egreso-date-to" value="${today}" style="width:100%;">
             </div>
+            <button class="btn btn-primary" onclick="filterNeteoByDate()" style="height:46px; display:flex; align-items:center; gap:8px; padding:0 24px;">
+                <i data-lucide="filter" style="width:18px;"></i> Calcular Neteo
+            </button>
         </div>
 
-        <div class="action-bar" style="margin-bottom:32px;">
-            <button class="btn btn-primary btn-lg" onclick="showAddEgresoModal()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:18px; font-size:1.1rem; font-weight:700; border-radius:16px;">
-                <i data-lucide="plus-circle"></i> Registrar Nuevo Egreso
+        <div id="neteo-metrics-panel"></div>
+
+        <div class="action-bar" style="margin-bottom:24px;">
+            <button class="btn btn-primary" onclick="showAddEgresoModal()" style="width:100%; border-radius:12px; padding:15px; font-weight:700;">
+                <i data-lucide="plus-circle"></i> Registrar Nuevo Egreso / Gasto
             </button>
         </div>
 
         <div class="data-table-container">
-            <div class="table-header"><h3>Listado de Egresos / Gastos</h3></div>
+            <div class="table-header"><h3>Conceptos de Gastos en el Periodo</h3></div>
             <table class="premium-table">
                 <thead>
                     <tr>
@@ -1375,76 +1383,207 @@ function renderEgresos() {
                         <th>Concepto / Descripción</th>
                         <th>Monto USD</th>
                         <th>Monto Bs.</th>
-                        <th>Tasa</th>
                         <th style="text-align:right;">Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="egresos-list">
-                    ${egresos.length > 0 ? egresos.slice().reverse().map(e => `
-                        <tr>
-                            <td data-label="Fecha">
-                                <p style="font-weight:600; color:var(--text-main); font-size:0.85rem;">${UI.formatDate(e.date).split(',')[0]}</p>
-                                <p style="font-size:0.75rem; color:var(--text-muted);">${UI.formatDate(e.date).split(',')[1] || ''}</p>
-                            </td>
-                            <td data-label="Concepto">
-                                <p style="font-weight:700; color:var(--text-main);">${e.category}</p>
-                                <p style="font-size:0.75rem; color:var(--text-muted);">${e.description}</p>
-                            </td>
-                            <td data-label="Monto USD">
-                                <p class="text-price" style="font-weight:700;">${UI.formatUSD(e.amountUSD)}</p>
-                            </td>
-                            <td data-label="Monto Bs.">
-                                <p class="text-price" style="color:var(--danger); font-weight:800;">${UI.formatCurrency(e.amountBS)}</p>
-                            </td>
-                            <td data-label="Tasa">
-                                <p style="font-size:0.8rem; color:var(--text-muted);">Bs. ${e.bcvRate.toFixed(2)}</p>
-                            </td>
-                            <td data-label="Acciones" style="text-align:right;">
-                                <div style="display:flex; justify-content:flex-end; gap:6px;">
-                                    <button class="btn btn-outline btn-sm" onclick="deleteEgreso(${e.id})" style="color:var(--danger);" title="Eliminar">
-                                        <i data-lucide="trash-2" style="width:14px;"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('') : '<tr><td colspan="6" style="text-align:center; padding:32px;">No se han registrado egresos aún.</td></tr>'}
+                <tbody id="egresos-list-body">
+                    <!-- Dinámico -->
                 </tbody>
             </table>
         </div>
     `;
     lucide.createIcons();
-    UI.paginateTable('egresos-list', 15);
+    filterNeteoByDate();
+}
+
+function filterNeteoByDate() {
+    const from = document.getElementById('egreso-date-from').value;
+    const to = document.getElementById('egreso-date-to').value;
+    const listBody = document.getElementById('egresos-list-body');
+    const metricsPanel = document.getElementById('neteo-metrics-panel');
+
+    if (!listBody || !metricsPanel) return;
+
+    // Filtrar Ventas del periodo
+    const filteredSales = sales.filter(s => {
+        const d = s.date.split('T')[0];
+        return d >= from && d <= to;
+    });
+
+    // Filtrar Egresos del periodo
+    const filteredEgresos = egresos.filter(e => {
+        const d = e.date.split('T')[0];
+        return d >= from && d <= to;
+    });
+
+    // Cálculos de Neteo
+    const totalSalesUSD = filteredSales.reduce((acc, s) => acc + (s.totalUSD || 0), 0);
+    const totalCostUSD = filteredSales.reduce((acc, s) => acc + s.items.reduce((sum, i) => sum + ((i.costUSD || 0) * i.qty), 0), 0);
+    const grossProfitUSD = totalSalesUSD - totalCostUSD;
+    
+    const totalEgresosUSD = filteredEgresos.reduce((acc, e) => acc + (e.amountUSD || 0), 0);
+    const totalEgresosBS = filteredEgresos.reduce((acc, e) => acc + (e.amountBS || 0), 0);
+    
+    const netProfitUSD = grossProfitUSD - totalEgresosUSD;
+    const netProfitBS = netProfitUSD * currentBCVRate;
+
+    metricsPanel.innerHTML = `
+        <div class="dashboard-stats" style="margin-bottom:24px;">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                    <i data-lucide="trending-up"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">GANANCIA VENTAS</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--success);">${UI.formatUSD(grossProfitUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Utilidad Bruta</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                    <i data-lucide="minus-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">EGRESOS PERIODO</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--danger);">${UI.formatUSD(totalEgresosUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalEgresosBS)}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: ${netProfitUSD >= 0 ? 'rgba(99, 102, 241, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${netProfitUSD >= 0 ? 'var(--primary)' : 'var(--danger)'};">
+                    <i data-lucide="calculator"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">NETEO FINAL</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: ${netProfitUSD >= 0 ? 'var(--primary)' : 'var(--danger)'};">${UI.formatUSD(netProfitUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(netProfitBS)}</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    listBody.innerHTML = filteredEgresos.length > 0 ? filteredEgresos.slice().reverse().map(e => `
+        <tr>
+            <td data-label="Fecha">
+                <p style="font-weight:600; color:var(--text-main); font-size:0.85rem;">${UI.formatDate(e.date).split(',')[0]}</p>
+                <p style="font-size:0.75rem; color:var(--text-muted);">${UI.formatDate(e.date).split(',')[1] || ''}</p>
+            </td>
+            <td data-label="Concepto">
+                <p style="font-weight:700; color:var(--text-main);">${e.category}</p>
+                <p style="font-size:0.75rem; color:var(--text-muted);">${e.description}</p>
+            </td>
+            <td data-label="Monto USD">
+                <p class="text-price" style="font-weight:700;">${UI.formatUSD(e.amountUSD)}</p>
+            </td>
+            <td data-label="Monto Bs.">
+                <p class="text-price" style="color:var(--danger); font-weight:800;">${UI.formatCurrency(e.amountBS)}</p>
+            </td>
+            <td data-label="Acciones" style="text-align:right;">
+                <button class="btn btn-outline btn-sm" onclick="deleteEgreso(${e.id})" style="color:var(--danger);">
+                    <i data-lucide="trash-2" style="width:14px;"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('') : '<tr><td colspan="5" style="text-align:center; padding:32px;">No se han registrado egresos en este periodo.</td></tr>';
+
+    lucide.createIcons();
+    UI.paginateTable('egresos-list-body', 15);
 }
 
 function showAddEgresoModal() {
+    const productOptions = products.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.unit === 'kg' ? p.stock.toFixed(3)+' kg' : p.stock+' u.'})</option>`).join('');
     UI.openModal("Registrar Nuevo Egreso", `
         <form id="egreso-form" onsubmit="event.preventDefault(); saveEgreso()">
             <div style="margin-bottom:12px;">
                 <label>Concepto / Categoría</label>
-                <select id="e-category" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+                <select id="e-category" onchange="toggleMercanciaLoss()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
                     <option value="Compra Mercancía">Compra de Mercancía</option>
                     <option value="Servicios">Pago de Servicios (Internet, Luz, etc.)</option>
                     <option value="Sueldos">Pago de Sueldos</option>
                     <option value="Alquiler">Alquiler</option>
-                    <option value="Otros">Otros Impulsos</option>
+                    <option value="Pérdida Mercancía">⚠️ Pérdida / Merma de Mercancía</option>
+                    <option value="Otros">Otros Gastos</option>
                 </select>
             </div>
+
+            <!-- Sección especial para Pérdida de Mercancía -->
+            <div id="loss-product-section" style="display:none; margin-bottom:16px; padding:16px; background:rgba(239,68,68,0.06); border:1px dashed var(--danger); border-radius:10px;">
+                <p style="font-size:0.8rem; color:var(--danger); font-weight:700; margin-bottom:10px;">⚠️ Esta acción descontará el stock del inventario.</p>
+                <div style="margin-bottom:10px;">
+                    <label style="font-size:0.85rem; font-weight:600;">Producto Perdido</label>
+                    <select id="e-loss-product" onchange="fillLossProductData()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--danger); margin-top:4px;">
+                        <option value="">-- Selecciona un producto --</option>
+                        ${productOptions}
+                    </select>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:0.85rem; font-weight:600;">Cantidad Perdida</label>
+                        <input type="number" id="e-loss-qty" step="0.001" min="0.001" placeholder="0" oninput="calculateLossAmount()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); margin-top:4px;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.85rem; font-weight:600;">Costo Unitario ($)</label>
+                        <input type="number" id="e-loss-cost" step="0.01" placeholder="0.00" oninput="calculateLossAmount()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); margin-top:4px;" readonly>
+                    </div>
+                </div>
+                <div style="margin-top:10px; padding:10px; background:rgba(239,68,68,0.1); border-radius:8px; text-align:center;">
+                    <p style="font-size:0.75rem; color:var(--text-muted);">Valor de la Pérdida</p>
+                    <p id="e-loss-total-display" style="font-weight:800; font-size:1.2rem; color:var(--danger);">$0.00</p>
+                </div>
+            </div>
+
             <div style="margin-bottom:12px;">
                 <label>Descripción detallada</label>
-                <textarea id="e-description" placeholder="Escribe el detalle del gasto..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); height:80px;"></textarea>
+                <textarea id="e-description" placeholder="Escribe el detalle del gasto..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); height:70px;"></textarea>
             </div>
-            <div style="margin-bottom:12px;">
+            <div id="e-manual-amount-section" style="margin-bottom:12px;">
                  <label>Monto ($)</label>
-                 <input type="number" step="0.01" id="e-amount-usd" required oninput="calculateEgresoBS()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);" placeholder="0.00">
+                 <input type="number" step="0.01" id="e-amount-usd" oninput="calculateEgresoBS()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);" placeholder="0.00">
             </div>
             <div style="margin-bottom:12px;">
-                 <label>Monto en Bolívares (Calculado automáticamente)</label>
-                 <input type="number" step="0.01" id="e-amount-bs" required style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-main); color:var(--primary); font-weight:700; font-size:1.1rem;" readonly>
+                 <label>Monto en Bolívares</label>
+                 <input type="number" step="0.01" id="e-amount-bs" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-main); color:var(--primary); font-weight:700; font-size:1.1rem;" readonly>
                  <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Tasa BCV: ${currentBCVRate.toFixed(2)} Bs/$</p>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px;">Guardar Egreso</button>
-        </form >
+        </form>
         `);
+}
+
+function toggleMercanciaLoss() {
+    const cat = document.getElementById('e-category').value;
+    const lossSection = document.getElementById('loss-product-section');
+    const manualSection = document.getElementById('e-manual-amount-section');
+    const amountInput = document.getElementById('e-amount-usd');
+    if (cat === 'Pérdida Mercancía') {
+        lossSection.style.display = 'block';
+        manualSection.style.display = 'none';
+        amountInput.removeAttribute('required');
+    } else {
+        lossSection.style.display = 'none';
+        manualSection.style.display = 'block';
+        amountInput.setAttribute('required', '');
+        document.getElementById('e-amount-usd').value = '';
+        document.getElementById('e-amount-bs').value = '';
+    }
+}
+
+function fillLossProductData() {
+    const pid = document.getElementById('e-loss-product').value;
+    const product = products.find(p => p.id == pid);
+    if (product) {
+        document.getElementById('e-loss-cost').value = product.costUSD || 0;
+        calculateLossAmount();
+    }
+}
+
+function calculateLossAmount() {
+    const qty = parseFloat(document.getElementById('e-loss-qty').value) || 0;
+    const cost = parseFloat(document.getElementById('e-loss-cost').value) || 0;
+    const totalUSD = qty * cost;
+    document.getElementById('e-loss-total-display').textContent = UI.formatUSD(totalUSD);
+    document.getElementById('e-amount-usd').value = totalUSD.toFixed(2);
+    calculateEgresoBS();
 }
 
 function calculateEgresoBS() {
@@ -1453,17 +1592,41 @@ function calculateEgresoBS() {
 }
 
 function saveEgreso() {
+    const category = document.getElementById('e-category').value;
+    const amountUSD = parseFloat(document.getElementById('e-amount-usd').value) || 0;
+
+    if (amountUSD <= 0) {
+        UI.showToast("El monto no puede ser cero", "error");
+        return;
+    }
+
+    // Manejo especial: Pérdida de Mercancía
+    if (category === 'Pérdida Mercancía') {
+        const pid = document.getElementById('e-loss-product').value;
+        const qty = parseFloat(document.getElementById('e-loss-qty').value) || 0;
+        if (!pid) return UI.showToast("Selecciona el producto perdido", "error");
+        if (qty <= 0) return UI.showToast("Ingresa la cantidad perdida", "error");
+
+        const product = products.find(p => p.id == pid);
+        if (!product) return UI.showToast("Producto no encontrado", "error");
+        if (qty > product.stock) return UI.showToast(`Stock insuficiente. Disponible: ${product.unit === 'kg' ? product.stock.toFixed(3)+' kg' : product.stock+' u.'}`, "error");
+
+        // Descontar del inventario
+        product.stock -= qty;
+        addLog('egreso', `Pérdida de mercancía: ${qty} ${product.unit === 'kg' ? 'kg' : 'u.'} de ${product.name}. Stock restante: ${product.unit === 'kg' ? product.stock.toFixed(3) : product.stock}`);
+    }
+
     const egreso = {
         id: Date.now(),
         date: new Date().toISOString(),
-        category: document.getElementById('e-category').value,
+        category: category,
         description: document.getElementById('e-description').value,
-        amountUSD: parseFloat(document.getElementById('e-amount-usd').value),
-        amountBS: parseFloat(document.getElementById('e-amount-bs').value),
+        amountUSD: amountUSD,
+        amountBS: parseFloat(document.getElementById('e-amount-bs').value) || (amountUSD * currentBCVRate),
         bcvRate: currentBCVRate
     };
     egresos.push(egreso);
-    addLog('egreso', `Nuevo egreso registrado: ${egreso.category} por Bs.${egreso.amountBS.toFixed(2)}`);
+    addLog('egreso', `Nuevo egreso registrado: ${egreso.category} por ${UI.formatUSD(egreso.amountUSD)}`);
     saveAll();
     UI.closeModal();
     renderEgresos();

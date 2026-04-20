@@ -1,210 +1,22 @@
 [
   {
-    "id": 1776547264049,
-    "code": "7591206000381",
-    "name": "Cheesetris mediano 150g",
-    "costUSD": 2.1,
-    "profitMargin": 30,
-    "priceUSD": 2.73,
-    "stock": 1
-  },
-  {
-    "id": 1776547436569,
-    "code": "7973593350896, 7599813000306",
-    "name": "Galletas coco crunch",
-    "costUSD": 1.25,
-    "profitMargin": 30,
-    "priceUSD": 1.63,
-    "stock": 5
-  },
-  {
-    "id": 1776547637260,
-    "code": "736372444738, 736372444677",
-    "name": "Puffy Pepito",
-    "costUSD": 0.9,
-    "profitMargin": 30,
-    "priceUSD": 1.17,
-    "stock": 3
-  },
-  {
-    "id": 1776547867293,
-    "code": "7592726009304",
-    "name": "Toallas hugme de noche moradas",
-    "costUSD": 0.92,
-    "profitMargin": 30,
-    "priceUSD": 1.2,
-    "stock": 6
-  },
-  {
-    "id": 1776548177056,
-    "code": "7591217001629, 5256120772197",
-    "name": "Crema alident grande 100g",
-    "costUSD": 1.3,
-    "profitMargin": 30,
-    "priceUSD": 1.69,
-    "stock": 4
-  },
-  {
-    "id": 1776548383235,
-    "code": "7622201512279",
-    "name": "Mayonesa Kraft pequeña",
-    "costUSD": 2.2,
-    "profitMargin": 30,
-    "priceUSD": 2.86,
-    "stock": 2
-  },
-  {
-    "id": 1776548486460,
+    "id": 1776698673186,
     "code": "1",
-    "name": "Afeitadora Dorco",
-    "costUSD": 0.3,
-    "profitMargin": 30,
-    "priceUSD": 0.39,
-    "stock": 9
-  },
-  {
-    "id": 1776549097242,
-    "code": "75930868",
-    "name": "Mantequilla mavesa 250g",
-    "costUSD": 1.72,
-    "profitMargin": 30,
-    "priceUSD": 2.24,
-    "stock": 7
-  },
-  {
-    "id": 1776550178514,
-    "code": "7591717000054",
-    "name": "Sal el campo 1kg",
-    "costUSD": 0.35,
-    "profitMargin": 30,
-    "priceUSD": 0.45,
-    "stock": 6
-  },
-  {
-    "id": 1776550509885,
-    "code": "7591874000287, 7591874000522",
-    "name": "Tostones TOM grande 80g",
-    "costUSD": 1.15,
-    "profitMargin": 30,
-    "priceUSD": 1.49,
-    "stock": 6
-  },
-  {
-    "id": 1776550841396,
-    "code": "7622210610652",
-    "name": "Paquete de club social ",
-    "costUSD": 1.8,
-    "profitMargin": 30,
-    "priceUSD": 2.34,
-    "stock": 6
-  },
-  {
-    "id": 1776551006120,
-    "code": "7590011205158",
-    "name": "Galleta club social unidad",
-    "costUSD": 0.32,
-    "profitMargin": 30,
-    "priceUSD": 0.42,
-    "stock": 40
-  },
-  {
-    "id": 1776551207681,
-    "code": "7592099001547",
-    "name": "Salsa de tomate Fregoso pequeña",
-    "costUSD": 1.17,
-    "profitMargin": 30,
-    "priceUSD": 1.52,
-    "stock": 6
-  },
-  {
-    "id": 1776551379698,
-    "code": "2",
-    "name": "Conflei Maizoritos",
-    "costUSD": 3,
-    "profitMargin": 30,
-    "priceUSD": 3.9,
-    "stock": 3
-  },
-  {
-    "id": 1776551727774,
-    "code": "3",
-    "name": "Sopa maggi ",
-    "costUSD": 1.57,
-    "profitMargin": 30,
-    "priceUSD": 2.04,
-    "stock": 6
-  },
-  {
-    "id": 1776552023465,
-    "code": "7595461001206",
-    "name": "Café amanecer 100g ",
-    "costUSD": 1.37,
-    "profitMargin": 30,
-    "priceUSD": 1.78,
-    "stock": 5
-  },
-  {
-    "id": 1776552242436,
-    "code": "7598928247414",
-    "name": "Café montaña 100g",
-    "costUSD": 1.36,
-    "profitMargin": 30,
-    "priceUSD": 1.77,
-    "stock": 6
-  },
-  {
-    "id": 1776552384165,
-    "code": "7598928249883",
-    "name": "Café montaña 200g",
-    "costUSD": 2.56,
-    "profitMargin": 30,
-    "priceUSD": 3.33,
-    "stock": 6
-  },
-  {
-    "id": 1776552557325,
-    "code": "7592307071430",
-    "name": "Azúcar alvarigua 800g",
-    "costUSD": 1.35,
-    "profitMargin": 30,
-    "priceUSD": 1.76,
-    "stock": 6
-  },
-  {
-    "id": 1776552664104,
-    "code": "7591201353123",
-    "name": "Harina de trigo leudante la pampa 920g",
-    "costUSD": 1.2,
-    "profitMargin": 30,
-    "priceUSD": 1.56,
-    "stock": 6
-  },
-  {
-    "id": 1776553135213,
-    "code": "80557952411",
-    "name": "Palitos de chocolate ",
-    "costUSD": 0.43,
-    "profitMargin": 30,
-    "priceUSD": 0.56,
-    "stock": 6
-  },
-  {
-    "id": 1776553260390,
-    "code": "7591206285498",
-    "name": "De todito pequeño",
-    "costUSD": 1.06,
-    "profitMargin": 30,
-    "priceUSD": 1.38,
-    "stock": 6
-  },
-  {
-    "id": 1776697862422,
-    "code": "34",
-    "name": "Tomate",
+    "name": "Dorito",
     "costUSD": 1,
     "profitMargin": 20,
     "priceUSD": 1.2,
-    "unit": "kg",
-    "stock": 14.9
+    "unit": "unid",
+    "stock": 20
+  },
+  {
+    "id": 1776698740273,
+    "code": "45864",
+    "name": "perrarina",
+    "costUSD": 25,
+    "profitMargin": 20,
+    "priceUSD": 30,
+    "unit": "unid",
+    "stock": 0
   }
 ]

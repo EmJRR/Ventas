@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "id": 1776698826180,
+    "date": "2026-04-20T15:27:06.180Z",
+    "category": "Servicios",
+    "description": "",
+    "amountUSD": 50,
+    "amountBS": 24060.88,
+    "bcvRate": 481.2177
+  },
+  {
+    "id": 1776699534077,
+    "date": "2026-04-20T15:38:54.077Z",
+    "category": "Otros",
+    "description": "Carne pa parrila fiesta",
+    "amountUSD": 20,
+    "amountBS": 9624.35,
+    "bcvRate": 481.2177
+  },
+  {
+    "id": 1776699614085,
+    "date": "2026-04-20T15:40:14.085Z",
+    "category": "Otros",
+    "description": "Perdida de 1 dorito",
+    "amountUSD": 1,
+    "amountBS": 481.22,
+    "bcvRate": 481.2177
+  },
+  {
+    "id": 1776700091959,
+    "date": "2026-04-20T15:48:11.959Z",
+    "category": "Pérdida Mercancía",
+    "description": "SE los comio un perro",
+    "amountUSD": 5,
+    "amountBS": 2406.09,
+    "bcvRate": 481.2177
+  }
+]

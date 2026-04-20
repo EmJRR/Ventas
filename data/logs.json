@@ -1,188 +1,80 @@
 [
   {
-    "id": 1776547264078,
-    "date": "2026-04-18T21:21:04.078Z",
+    "id": 1776698673193,
+    "date": "2026-04-20T15:24:33.193Z",
     "type": "inventario",
-    "message": "Nuevo producto agregado: Cheesetris mediano 150g "
+    "message": "Nuevo producto agregado: Dorito "
   },
   {
-    "id": 1776547436573,
-    "date": "2026-04-18T21:23:56.573Z",
+    "id": 1776698740279,
+    "date": "2026-04-20T15:25:40.279Z",
     "type": "inventario",
-    "message": "Nuevo producto agregado: Galletas coco crunch "
+    "message": "Nuevo producto agregado: perrarina "
   },
   {
-    "id": 1776547451738,
-    "date": "2026-04-18T21:24:11.738Z",
+    "id": 1776698792137,
+    "date": "2026-04-20T15:26:32.137Z",
     "type": "inventario",
-    "message": "Producto actualizado: Galletas coco crunch "
+    "message": "Producto actualizado: Dorito "
   },
   {
-    "id": 1776547463907,
-    "date": "2026-04-18T21:24:23.907Z",
-    "type": "tasa",
-    "message": "Tasa BCV actualizada manualmente a Bs.483.00 "
+    "id": 1776698826180,
+    "date": "2026-04-20T15:27:06.180Z",
+    "type": "egreso",
+    "message": "Nuevo egreso registrado: Servicios por Bs.24060.88"
   },
   {
-    "id": 1776547637287,
-    "date": "2026-04-18T21:27:17.287Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Puffy Pepito "
-  },
-  {
-    "id": 1776547867297,
-    "date": "2026-04-18T21:31:07.297Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Toallas hugme de noche moradas "
-  },
-  {
-    "id": 1776548177079,
-    "date": "2026-04-18T21:36:17.079Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Crema alident grande 100g "
-  },
-  {
-    "id": 1776548383264,
-    "date": "2026-04-18T21:39:43.264Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Mayonesa Kraft pequeña "
-  },
-  {
-    "id": 1776548486488,
-    "date": "2026-04-18T21:41:26.488Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Afeitadora Dorco "
-  },
-  {
-    "id": 1776549097262,
-    "date": "2026-04-18T21:51:37.262Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Mantequilla mavesa 250g "
-  },
-  {
-    "id": 1776550178539,
-    "date": "2026-04-18T22:09:38.539Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Sal el campo 1kg "
-  },
-  {
-    "id": 1776550509903,
-    "date": "2026-04-18T22:15:09.903Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Tostones TOM grande 80g "
-  },
-  {
-    "id": 1776550841418,
-    "date": "2026-04-18T22:20:41.418Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Paquete de club social  "
-  },
-  {
-    "id": 1776551006143,
-    "date": "2026-04-18T22:23:26.143Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Galleta club social unidad "
-  },
-  {
-    "id": 1776551207705,
-    "date": "2026-04-18T22:26:47.705Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Salsa de tomate Fregoso pequeña "
-  },
-  {
-    "id": 1776551379728,
-    "date": "2026-04-18T22:29:39.728Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Conflei Maizoritos "
-  },
-  {
-    "id": 1776551727802,
-    "date": "2026-04-18T22:35:27.802Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Sopa maggi  "
-  },
-  {
-    "id": 1776552023490,
-    "date": "2026-04-18T22:40:23.490Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Café amanecer 100g  "
-  },
-  {
-    "id": 1776552242443,
-    "date": "2026-04-18T22:44:02.443Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Café montaña 100g "
-  },
-  {
-    "id": 1776552384169,
-    "date": "2026-04-18T22:46:24.169Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Café montaña 200g "
-  },
-  {
-    "id": 1776552557328,
-    "date": "2026-04-18T22:49:17.328Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Azúcar alvarigua 800g "
-  },
-  {
-    "id": 1776552664107,
-    "date": "2026-04-18T22:51:04.107Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Harina de trigo leudante la pampa 920g "
-  },
-  {
-    "id": 1776553135237,
-    "date": "2026-04-18T22:58:55.237Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Palitos de chocolate  "
-  },
-  {
-    "id": 1776553260392,
-    "date": "2026-04-18T23:01:00.392Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: De todito pequeño "
-  },
-  {
-    "id": 1776691393243,
-    "date": "2026-04-20T13:23:13.243Z",
-    "type": "sistema",
-    "message": "Restauración de backup aplicada: 18/4/2026"
-  },
-  {
-    "id": 1776695746115,
-    "date": "2026-04-20T14:35:46.115Z",
-    "type": "sistema",
-    "message": "Backup automático guardado en el servidor"
-  },
-  {
-    "id": 1776697301864,
-    "date": "2026-04-20T15:01:41.864Z",
-    "type": "servicio",
-    "message": "Recarga realizada por Bs.S 250,00 (Ganancia: Bs.S 25,00)"
-  },
-  {
-    "id": 1776697383460,
-    "date": "2026-04-20T15:03:03.460Z",
-    "type": "servicio",
-    "message": "Avance de efectivo: Entregado Bs.S 100,00, Cobrado Bs.S 120,00"
-  },
-  {
-    "id": 1776697475126,
-    "date": "2026-04-20T15:04:35.126Z",
-    "type": "sistema",
-    "message": "Backup automático guardado en el servidor"
-  },
-  {
-    "id": 1776697862429,
-    "date": "2026-04-20T15:11:02.429Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: Tomate "
-  },
-  {
-    "id": 1776697891272,
-    "date": "2026-04-20T15:11:31.272Z",
+    "id": 1776699238122,
+    "date": "2026-04-20T15:33:58.122Z",
     "type": "venta",
-    "message": "Venta registrada por Bs.S 288,73 ($0.60)"
+    "message": "Venta registrada por Bs.S 28.873,06 ($60.00)"
+  },
+  {
+    "id": 1776699410646,
+    "date": "2026-04-20T15:36:50.646Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 40.422,29 ($84.00)"
+  },
+  {
+    "id": 1776699423500,
+    "date": "2026-04-20T15:37:03.500Z",
+    "type": "inventario",
+    "message": "Producto actualizado: perrarina "
+  },
+  {
+    "id": 1776699457218,
+    "date": "2026-04-20T15:37:37.218Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 144.365,31 ($300.00)"
+  },
+  {
+    "id": 1776699534077,
+    "date": "2026-04-20T15:38:54.077Z",
+    "type": "egreso",
+    "message": "Nuevo egreso registrado: Otros por Bs.9624.35"
+  },
+  {
+    "id": 1776699614085,
+    "date": "2026-04-20T15:40:14.085Z",
+    "type": "egreso",
+    "message": "Nuevo egreso registrado: Otros por Bs.481.22"
+  },
+  {
+    "id": 1776700052460,
+    "date": "2026-04-20T15:47:32.460Z",
+    "type": "inventario",
+    "message": "Producto actualizado: Dorito "
+  },
+  {
+    "id": 1776700091956,
+    "date": "2026-04-20T15:48:11.956Z",
+    "type": "egreso",
+    "message": "Pérdida de mercancía: 5 u. de Dorito. Stock restante: 20"
+  },
+  {
+    "id": 1776700091959,
+    "date": "2026-04-20T15:48:11.959Z",
+    "type": "egreso",
+    "message": "Nuevo egreso registrado: Pérdida Mercancía por $5.00"
   }
 ]
