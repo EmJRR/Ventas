@@ -1,0 +1,237 @@
+{
+  "version": "2.0",
+  "timestamp": "2026-04-20T13:22:49.087Z",
+  "products": [
+    {
+      "id": 1776466924775,
+      "code": "31232",
+      "name": "asdads",
+      "costUSD": 112,
+      "profitMargin": 20,
+      "priceUSD": 134.4,
+      "stock": 48
+    }
+  ],
+  "clients": [
+    {
+      "id": 1776466943273,
+      "name": "Kenai",
+      "phone": "",
+      "email": "",
+      "address": "",
+      "debt": 130613.14,
+      "createdAt": "2026-04-17T23:02:23.273Z"
+    }
+  ],
+  "sales": [
+    {
+      "id": 1776466939260,
+      "date": "2026-04-17T23:02:19.260Z",
+      "clientId": 0,
+      "items": [
+        {
+          "id": 1776466924775,
+          "name": "asdads",
+          "qty": 2,
+          "priceUSD": 134.4,
+          "costUSD": 112
+        }
+      ],
+      "totalUSD": 268.8,
+      "totalBS": 129093.13536000001,
+      "paymentMethods": {
+        "movil": 129093.14,
+        "debito": 0,
+        "cashUSD": 0,
+        "debt": 0
+      },
+      "paymentType": "completo",
+      "bcvRate": 480.2572
+    },
+    {
+      "id": 1776466954903,
+      "date": "2026-04-17T23:02:34.903Z",
+      "clientId": 1776466943273,
+      "items": [
+        {
+          "id": 1776466924775,
+          "name": "asdads",
+          "qty": 2,
+          "priceUSD": 134.4,
+          "costUSD": 112
+        }
+      ],
+      "totalUSD": 268.8,
+      "totalBS": 129093.13536000001,
+      "paymentMethods": {
+        "movil": 0,
+        "debito": 0,
+        "cashUSD": 0,
+        "debt": 129093.14
+      },
+      "paymentType": "mixto/deuda",
+      "bcvRate": 480.2572
+    },
+    {
+      "id": 1776467136990,
+      "date": "2026-04-17T23:05:36.990Z",
+      "clientId": 1776466943273,
+      "items": [
+        {
+          "id": 1776466924775,
+          "name": "asdads",
+          "qty": 1,
+          "priceUSD": 134.4,
+          "costUSD": 112
+        }
+      ],
+      "totalUSD": 134.4,
+      "totalBS": 64546.56768000001,
+      "paymentMethods": {
+        "movil": 45615,
+        "debito": 10001.2,
+        "cashUSD": 15.43,
+        "debt": 1520
+      },
+      "paymentType": "mixto/deuda",
+      "bcvRate": 480.2572
+    },
+    {
+      "id": 1776467183306,
+      "date": "2026-04-17T23:06:23.306Z",
+      "clientId": 0,
+      "items": [
+        {
+          "id": 1776466924775,
+          "name": "asdads",
+          "qty": 1,
+          "priceUSD": 134.4,
+          "costUSD": 112
+        }
+      ],
+      "totalUSD": 134.4,
+      "totalBS": 64546.56768000001,
+      "paymentMethods": {
+        "movil": 64546.57,
+        "debito": 0,
+        "cashUSD": 0,
+        "debt": 0
+      },
+      "paymentType": "completo",
+      "bcvRate": 480.2572
+    },
+    {
+      "id": 1776467201585,
+      "date": "2026-04-17T23:06:41.585Z",
+      "clientId": 0,
+      "items": [
+        {
+          "id": 1776466924775,
+          "name": "asdads",
+          "qty": 1,
+          "priceUSD": 134.4,
+          "costUSD": 112
+        }
+      ],
+      "totalUSD": 134.4,
+      "totalBS": 64546.56768000001,
+      "paymentMethods": {
+        "movil": 0,
+        "debito": 64546.57,
+        "cashUSD": 0,
+        "debt": 0
+      },
+      "paymentType": "completo",
+      "bcvRate": 480.2572
+    },
+    {
+      "id": 1776467205052,
+      "date": "2026-04-17T23:06:45.052Z",
+      "clientId": 0,
+      "items": [
+        {
+          "id": 1776466924775,
+          "name": "asdads",
+          "qty": 1,
+          "priceUSD": 134.4,
+          "costUSD": 112
+        }
+      ],
+      "totalUSD": 134.4,
+      "totalBS": 64546.56768000001,
+      "paymentMethods": {
+        "movil": 0,
+        "debito": 0,
+        "cashUSD": 134.4,
+        "debt": 0
+      },
+      "paymentType": "completo",
+      "bcvRate": 480.2572
+    }
+  ],
+  "payments": [],
+  "egresos": [],
+  "logs": [
+    {
+      "id": 1776466924776,
+      "date": "2026-04-17T23:02:04.776Z",
+      "type": "inventario",
+      "message": "Nuevo producto agregado: asdads "
+    },
+    {
+      "id": 1776466939260,
+      "date": "2026-04-17T23:02:19.260Z",
+      "type": "venta",
+      "message": "Venta registrada por Bs.S 129.093,14 ($268.80)"
+    },
+    {
+      "id": 1776466943273,
+      "date": "2026-04-17T23:02:23.273Z",
+      "type": "cliente",
+      "message": "Nuevo cliente registrado: Kenai "
+    },
+    {
+      "id": 1776466954903,
+      "date": "2026-04-17T23:02:34.903Z",
+      "type": "venta",
+      "message": "Venta registrada por Bs.S 129.093,14 ($268.80)"
+    },
+    {
+      "id": 1776467136990,
+      "date": "2026-04-17T23:05:36.990Z",
+      "type": "venta",
+      "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+    },
+    {
+      "id": 1776467183306,
+      "date": "2026-04-17T23:06:23.306Z",
+      "type": "venta",
+      "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+    },
+    {
+      "id": 1776467195610,
+      "date": "2026-04-17T23:06:35.610Z",
+      "type": "inventario",
+      "message": "Producto actualizado: asdads "
+    },
+    {
+      "id": 1776467201585,
+      "date": "2026-04-17T23:06:41.585Z",
+      "type": "venta",
+      "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+    },
+    {
+      "id": 1776467205052,
+      "date": "2026-04-17T23:06:45.052Z",
+      "type": "venta",
+      "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+    },
+    {
+      "id": 1776471703803,
+      "date": "2026-04-18T00:21:43.803Z",
+      "type": "sistema",
+      "message": "Backup automático guardado en el servidor"
+    }
+  ],
+  "settings": []
+}

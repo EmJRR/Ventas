@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1776466924776,
+    "date": "2026-04-17T23:02:04.776Z",
+    "type": "inventario",
+    "message": "Nuevo producto agregado: asdads "
+  },
+  {
+    "id": 1776466939260,
+    "date": "2026-04-17T23:02:19.260Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 129.093,14 ($268.80)"
+  },
+  {
+    "id": 1776466943273,
+    "date": "2026-04-17T23:02:23.273Z",
+    "type": "cliente",
+    "message": "Nuevo cliente registrado: Kenai "
+  },
+  {
+    "id": 1776466954903,
+    "date": "2026-04-17T23:02:34.903Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 129.093,14 ($268.80)"
+  },
+  {
+    "id": 1776467136990,
+    "date": "2026-04-17T23:05:36.990Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+  },
+  {
+    "id": 1776467183306,
+    "date": "2026-04-17T23:06:23.306Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+  },
+  {
+    "id": 1776467195610,
+    "date": "2026-04-17T23:06:35.610Z",
+    "type": "inventario",
+    "message": "Producto actualizado: asdads "
+  },
+  {
+    "id": 1776467201585,
+    "date": "2026-04-17T23:06:41.585Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+  },
+  {
+    "id": 1776467205052,
+    "date": "2026-04-17T23:06:45.052Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 64.546,57 ($134.40)"
+  },
+  {
+    "id": 1776471703803,
+    "date": "2026-04-18T00:21:43.803Z",
+    "type": "sistema",
+    "message": "Backup automático guardado en el servidor"
+  },
+  {
+    "id": 1776691369106,
+    "date": "2026-04-20T13:22:49.106Z",
+    "type": "sistema",
+    "message": "Backup automático guardado en el servidor"
+  }
+]

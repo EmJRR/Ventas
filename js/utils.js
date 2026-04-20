@@ -45,6 +45,30 @@ const UI = {
         document.getElementById('modal-container').classList.remove('active');
     },
 
+    showSyncError: () => {
+        const title = "⚠️ Error de Sincronización";
+        const html = `
+            <div style="text-align:center; padding:20px;">
+                <div style="width:60px; height:60px; background:#fee2e2; color:#dc2626; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px auto;">
+                    <i data-lucide="wifi-off" style="width:30px; height:30px;"></i>
+                </div>
+                <h3 style="margin-bottom:10px;">¡Ups! No pudimos conectar con la Laptop</h3>
+                <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.9rem;">
+                    El servidor principal no responde. Si continúas, estarás trabajando con datos antiguos o locales, y los cambios no se guardarán en el servidor por seguridad.
+                </p>
+                <div style="display:flex; gap:10px; flex-direction:column;">
+                    <button class="btn btn-primary" style="width:100%; height:50px; font-weight:700;" onclick="location.reload()">
+                        <i data-lucide="refresh-cw"></i> Reintentar Conexión
+                    </button>
+                    <button class="btn btn-outline" style="width:100%;" onclick="UI.closeModal()">
+                        Continuar de todos modos (Modo Local)
+                    </button>
+                </div>
+            </div>
+        `;
+        UI.openModal(title, html);
+    },
+
     // Currency Formatting & Input Masking
     formatCurrency: (amount) => {
         return new Intl.NumberFormat('es-VE', {
@@ -134,8 +158,9 @@ const UI = {
         for (let i = 0; i < tr.length; i++) {
             let found = false;
             const tdArray = tr[i].getElementsByTagName("td");
-            if (tdArray.length === 1 && tdArray[0].colSpan > 1) continue; // Saltar placeholder
+            if (tdArray.length === 1 && tdArray[0].colSpan > 1) continue; 
 
+            // Buscar en todas las celdas (Nombre, Código, etc.)
             for (let j = 0; j < tdArray.length; j++) {
                 if (tdArray[j]) {
                     const txtValue = tdArray[j].textContent || tdArray[j].innerText;
@@ -145,21 +170,20 @@ const UI = {
                     }
                 }
             }
+            
             if (found) {
                 tr[i].classList.remove('search-hidden');
+                tr[i].style.display = ""; // Reset display to allow pagination to decide
             } else {
                 tr[i].classList.add('search-hidden');
+                tr[i].style.display = "none"; // Hide immediately
             }
         }
 
+        // Reiniciar a la página 1 y re-paginar
         element.dataset.currentPage = 1;
-        if (element.dataset.paginate === 'true') {
-            UI.paginateTable(tableId, parseInt(element.dataset.itemsPerPage) || 15);
-        } else {
-            for (let i = 0; i < tr.length; i++) {
-                tr[i].style.display = tr[i].classList.contains('search-hidden') ? 'none' : '';
-            }
-        }
+        const itemsPerPage = parseInt(element.dataset.itemsPerPage) || 15;
+        UI.paginateTable(tableId, itemsPerPage);
     },
 
     paginateTable: (tableId, itemsPerPage = 15) => {

@@ -6,6 +6,7 @@ let products, clients, sales, payments, egresos, logs, settings, currentBCVRate;
 async function bootstrapApp() {
     const isOnline = await Storage.init();
 
+    // Obtener datos del Storage (Híbrido)
     products = Storage.get('products');
     clients = Storage.get('clients');
     sales = Storage.get('sales');
@@ -15,11 +16,12 @@ async function bootstrapApp() {
     settings = Storage.get('settings') || { lowStockThreshold: 5, businessName: 'SoluVentas', businessRIF: '', businessPhone: '', businessAddress: '' };
     currentBCVRate = parseFloat(localStorage.getItem('soluventas_manual_bcv')) || 45.0;
 
-    // Notificar estado de conexión
+    // Notificar estado de conexión de forma más evidente si falló
     if (isOnline) {
         UI.showToast('Conectado a la Laptop (Sincronizado)', 'success');
     } else {
-        UI.showToast('Modo Offline: Usando datos locales', 'warning');
+        // Si no está online, mostramos el modal de error/aviso
+        setTimeout(() => UI.showSyncError(), 1000);
     }
 
     // Inicializar UI y Eventos
@@ -690,7 +692,11 @@ function renderInventario() {
 }
 // 3. Ventas (Nueva Venta) Logic
 let cart = [];
+let currentPOSPage = 1;
+
 function renderVentas() {
+    currentPOSPage = 1; // Resetear página al entrar
+
     contentArea.innerHTML = `
         <div class="sales-terminal" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
             <!-- Selector de Productos -->
@@ -721,15 +727,16 @@ function renderVentas() {
                         </div>
                     </div>
                 </div>
-                <div class="products-grid" id="pos-products" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-top:16px;">
-                    ${products.map(p => `
-                        <div class="product-item-card" onclick="addToCart(${p.id})" style="border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s;">
-                            <p style="font-weight:700; font-size:0.9rem;">${p.name}</p>
-                            <p style="color: var(--primary); font-weight:700; font-size:1rem;">${UI.formatUSD(p.priceUSD || 0)}</p>
-                            <p style="font-size: 0.75rem; color: var(--text-muted);">${UI.formatCurrency((p.priceUSD || 0) * currentBCVRate)}</p>
-                            <p style="font-size: 0.7rem; color: var(--text-muted);">Stock: ${p.stock}</p>
-                        </div>
-                    `).join('')}
+                <!-- Contenedor Paginado -->
+                <div id="pos-products-container">
+                    <div class="products-grid" id="pos-products" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top:16px;">
+                        <!-- Se llena vía renderPOSProducts -->
+                    </div>
+                </div>
+                
+                <!-- Controles de Paginación -->
+                <div id="pos-pagination" style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px; padding: 10px;">
+                    <!-- Se llena dinámicamente -->
                 </div>
             </div>
 
@@ -773,12 +780,14 @@ function renderVentas() {
         </div>
     `;
     updateCartUI();
+    renderPOSProducts(products); // Carga inicial de productos paginados
     lucide.createIcons();
 }
 
 function filterPOS(val) {
     const query = val.toLowerCase();
     const filtered = products.filter(p => p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query));
+    currentPOSPage = 1;
     renderPOSProducts(filtered);
 }
 
@@ -795,15 +804,66 @@ function checkSecretCode(val) {
 
 function renderPOSProducts(list) {
     const container = document.getElementById('pos-products');
-    if (!container) return;
-    container.innerHTML = list.map(p => `
-        <div class="product-item-card" onclick="addToCart(${p.id})" style="border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; cursor: pointer;">
-            <p style="font-weight:700; font-size:0.9rem;">${p.name}</p>
-            <p style="color: var(--primary); font-weight:700; font-size:1rem;">${UI.formatUSD(p.priceUSD || 0)}</p>
-            <p style="font-size: 0.75rem; color: var(--text-muted);">${UI.formatCurrency((p.priceUSD || 0) * currentBCVRate)}</p>
-            <p style="font-size: 0.7rem; color: var(--text-muted);">Stock: ${p.stock}</p>
+    const paginationContainer = document.getElementById('pos-pagination');
+    if (!container || !paginationContainer) return;
+
+    // Determinar tamaño de página por dispositivo
+    const isMobile = window.innerWidth <= 768;
+    const pageSize = isMobile ? 4 : 6;
+    
+    const totalPages = Math.ceil(list.length / pageSize);
+    if (currentPOSPage > totalPages) currentPOSPage = Math.max(1, totalPages);
+
+    const start = (currentPOSPage - 1) * pageSize;
+    const end = start + pageSize;
+    const paginatedList = list.slice(start, end);
+
+    // Renderizar Productos
+    if (paginatedList.length === 0) {
+        container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 20px;">No se encontraron productos</p>`;
+        paginationContainer.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = paginatedList.map(p => `
+        <div class="product-item-card" onclick="addToCart(${p.id})" 
+             style="border: 1px solid var(--border-color); padding: 12px; border-radius: 12px; cursor: pointer; background: var(--bg-card); display:flex; flex-direction:column; gap:4px; transition: transform 0.2s;">
+            <p style="font-weight:700; font-size:0.85rem; line-height:1.2; height:2rem; overflow:hidden;">${p.name}</p>
+            <p style="color: var(--primary); font-weight:800; font-size:1.1rem; margin-top:4px;">${UI.formatUSD(p.priceUSD || 0)}</p>
+            <p style="font-size: 0.7rem; color: var(--text-muted);">${UI.formatCurrency((p.priceUSD || 0) * currentBCVRate)}</p>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius:4px; background: ${p.stock <= settings.lowStockThreshold ? '#fee2e2' : '#f0fdf4'}; color: ${p.stock <= settings.lowStockThreshold ? '#ef4444' : '#22c55e'}; font-weight:600;">
+                    Stock: ${p.stock}
+                </span>
+            </div>
         </div>
     `).join('');
+
+    // Renderizar Controles de Paginación
+    paginationContainer.innerHTML = `
+        <button class="btn btn-outline btn-sm" ${currentPOSPage === 1 ? 'disabled style="opacity:0.5"' : ''} onclick="changePOSPage(-1)">
+            <i data-lucide="chevron-left"></i>
+        </button>
+        <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted);">
+            Página ${currentPOSPage} de ${totalPages}
+        </span>
+        <button class="btn btn-outline btn-sm" ${currentPOSPage === totalPages ? 'disabled style="opacity:0.5"' : ''} onclick="changePOSPage(1)">
+            <i data-lucide="chevron-right"></i>
+        </button>
+    `;
+    
+    lucide.createIcons();
+}
+
+// Función para cambiar de página
+function changePOSPage(dir) {
+    currentPOSPage += dir;
+    const searchInput = document.getElementById('pos-search');
+    const query = searchInput ? searchInput.value.toLowerCase() : '';
+    const filtered = products.filter(p => p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query));
+    renderPOSProducts(filtered);
+    // Scroll suave hacia los productos
+    document.getElementById('pos-products-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // 4. Clientes Logic
@@ -2570,9 +2630,6 @@ function saveManualRate() {
 
 // Spinning animation for refresh button
 const spinStyle = document.createElement('style');
-spinStyle.textContent = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } .spinning { animation: spin 1s linear infinite; } `;
-document.head.appendChild(spinStyle);
-
 document.getElementById('refresh-bcv').addEventListener('click', (e) => {
     e.stopPropagation();
     fetchBCVRate();
@@ -2583,7 +2640,7 @@ document.getElementById('manual-bcv').addEventListener('click', (e) => {
     showManualRateModal();
 });
 
-// Toggle para móvil
+// Toggle para móvil (Indicador Dólar)
 document.getElementById('dolar-indicator').addEventListener('click', function() {
     if (window.innerWidth <= 768) {
         this.classList.add('expanded');
@@ -2595,5 +2652,4 @@ document.getElementById('close-dolar-actions').addEventListener('click', (e) => 
     document.getElementById('dolar-indicator').classList.remove('expanded');
 });
 
-// No se necesita el listener de 'load' redundante que causa condiciones de carrera
-// El inicio se maneja exclusivamente por bootstrapApp en DOMContentLoaded
+// Inicialización de la App se maneja vía DOMContentLoaded

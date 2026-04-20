@@ -26,7 +26,17 @@ app.get('/api/all', (req, res) => {
     keys.forEach(key => {
         const p = getFilePath(key);
         if (fs.existsSync(p)) {
-            result[key] = JSON.parse(fs.readFileSync(p, 'utf8'));
+            try {
+                const content = fs.readFileSync(p, 'utf8');
+                if (content.trim()) {
+                    result[key] = JSON.parse(content);
+                } else {
+                    result[key] = key === 'settings' ? { lowStockThreshold: 5 } : [];
+                }
+            } catch (e) {
+                console.error(`❌ Error parsing ${key}.json:`, e);
+                result[key] = key === 'settings' ? { lowStockThreshold: 5 } : [];
+            }
         } else {
             result[key] = key === 'settings' ? { lowStockThreshold: 5 } : [];
         }
@@ -37,6 +47,17 @@ app.get('/api/all', (req, res) => {
 app.post('/api/save/:key', (req, res) => {
     const key = req.params.key;
     const filePath = getFilePath(key);
+    const backupPath = `${filePath}.bak`;
+
+    // Protección: Si el archivo existe, crear backup temporal antes de sobrescribir
+    if (fs.existsSync(filePath)) {
+        try {
+            fs.copyFileSync(filePath, backupPath);
+        } catch (e) {
+            console.warn(`Could not create backup for ${key}`);
+        }
+    }
+
     fs.writeFile(filePath, JSON.stringify(req.body, null, 2), (err) => {
         if (err) {
             console.error(`Error saving ${key}:`, err);

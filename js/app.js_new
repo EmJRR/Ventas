@@ -1,0 +1,17 @@
+/* app.js - Main Application Logic */
+
+// Global State (Inicialización segura)
+let products = [], clients = [], sales = [], payments = [], egresos = [], logs = [], settings = {}, currentBCVRate = 45.0;
+
+async function bootstrapApp() {
+    const isOnline = await Storage.init();
+
+    // Obtener datos del Storage (Híbrido)
+    products = Storage.get('products');
+    clients = Storage.get('clients');
+    sales = Storage.get('sales');
+    payments = Storage.get('payments');
+    egresos = Storage.get('egresos');
+    logs = Storage.get('logs');
+    settings = Storage.get('settings') || { lowStockThreshold: 5, businessName: 'SoluVentas', businessRIF: '', businessPhone: '', businessAddress: '' };
+    currentBCVRate = parseFloat(localStorage.getItem('soluventas_manual_bcv')) || 45.0;
