@@ -191,21 +191,41 @@ async function startScan() {
     
     try {
         if (scannerState.cameras.length === 0) {
-            scannerState.cameras = await Html5Qrcode.getCameras();
+            const rawCameras = await Html5Qrcode.getCameras();
+            // Transformar a objetos con label y source (ID o facingMode)
+            scannerState.cameras = rawCameras.map(c => ({
+                label: c.label,
+                source: c.id
+            }));
+
+            // Si no detectamos una frontal por nombre, agregar la opción genérica "user"
+            const hasFront = scannerState.cameras.some(c => 
+                c.label.toLowerCase().includes('front') || 
+                c.label.toLowerCase().includes('delantera') || 
+                c.label.toLowerCase().includes('selfie') ||
+                c.label.toLowerCase().includes('user')
+            );
+
+            if (!hasFront) {
+                scannerState.cameras.push({
+                    label: "Cámara Frontal (Selfie)",
+                    source: { facingMode: "user" }
+                });
+            }
         }
 
-        if (!scannerState.cameras || scannerState.cameras.length === 0) {
+        if (scannerState.cameras.length === 0) {
             readerDiv.innerHTML = '<p style="color:white; padding:20px;">No se detectaron cámaras.</p>';
             return;
         }
 
-        // Mostrar botón de cambio si hay más de una cámara
+        // Mostrar botón de cambio si hay más de una opción
         if (switchBtn) {
             switchBtn.style.display = scannerState.cameras.length > 1 ? 'flex' : 'none';
         }
 
-        // Si es la primera vez, intentar buscar traseras
-        if (scannerState.cameras.length > 1 && scannerState.cameraIndex === 0 && !window.html5QrCode) {
+        // Seleccionar cámara trasera por defecto al inicio
+        if (scannerState.cameraIndex === 0 && !window.html5QrCode) {
              const backIdx = scannerState.cameras.findIndex(c => 
                 c.label.toLowerCase().includes('back') || 
                 c.label.toLowerCase().includes('trasera') ||
@@ -214,7 +234,7 @@ async function startScan() {
              if (backIdx !== -1) scannerState.cameraIndex = backIdx;
         }
 
-        const selectedCamera = scannerState.cameras[scannerState.cameraIndex];
+        const selected = scannerState.cameras[scannerState.cameraIndex];
         const html5QrCode = new Html5Qrcode("reader");
         window.html5QrCode = html5QrCode;
 
@@ -228,7 +248,7 @@ async function startScan() {
         };
 
         await html5QrCode.start(
-            selectedCamera.id,
+            selected.source,
             config,
             (decodedText) => {
                 const input = document.getElementById(scannerState.targetId);
