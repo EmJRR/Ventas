@@ -262,17 +262,19 @@ async function startScan() {
 }
 
 UI.switchCamera = function() {
-    if (!window.html5QrCode) return;
+    if (!window.html5QrCode || scannerState.cameras.length < 2) return;
     
     scannerState.cameraIndex = (scannerState.cameraIndex + 1) % scannerState.cameras.length;
+    const nextCamera = scannerState.cameras[scannerState.cameraIndex];
     
-    UI.showToast("Cambiando cámara...", "info");
+    UI.showToast(`Cambiando a: ${nextCamera.label || 'Cámara ' + (scannerState.cameraIndex + 1)}`, "info");
     
     window.html5QrCode.stop().then(() => {
         window.html5QrCode = null;
         startScan();
     }).catch(err => {
         console.error("Error stopping for switch:", err);
+        window.html5QrCode = null;
         startScan();
     });
 };
