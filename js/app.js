@@ -1368,7 +1368,7 @@ function filterHistorialByDate() {
                 </td>
                 <td data-label="Acciones" style="text-align:right;">
                     <div style="display:flex; justify-content:flex-end; gap:6px;">
-                        <button class="btn btn-outline btn-sm" onclick="printReceipt(${s.id})" title="Reimprimir Ticket">
+                        <button class="btn btn-outline btn-sm" onclick="printTicket(${s.id})" title="Reimprimir Ticket">
                             <i data-lucide="printer" style="width:14px;"></i>
                         </button>
                         <button class="btn btn-outline btn-sm" onclick="deleteSale(${s.id})" style="color:var(--danger);" title="Eliminar Venta">
@@ -2771,81 +2771,206 @@ function printTicket(saleId) {
     const client = clients.find(c => c.id == s.clientId);
     const clientName = client?.name || 'Cliente General';
     const biz = settings.businessName || 'SoluVentas';
-    const bizPhone = settings.businessPhone || '';
-    const bizAddr = settings.businessAddress || '';
     const bcvRate = s.bcvRate || currentBCVRate;
 
-    const ticketWin = window.open('', '_blank', 'width=400,height=700');
+    const dateObj = new Date(s.date);
+    const formattedDate = dateObj.toLocaleDateString('es-VE') + ' ' + 
+                         dateObj.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+    const ticketWin = window.open('', '_blank', 'width=450,height=800');
     ticketWin.document.write(`
-        < !DOCTYPE html >
-            <html>
-                <head>
-                    <meta charset="UTF-8">
-                        <title>Ticket #${s.id}</title>
-                        <style>
-                            * {margin:0; padding:0; box-sizing:border-box; }
-                            body {font - family: 'Courier New', monospace; font-size: 12px; color: #000; width: 300px; margin: 0 auto; padding: 10px; }
-                            .center {text - align: center; }
-                            .bold {font - weight: bold; }
-                            .line {border - top: 1px dashed #000; margin: 8px 0; }
-                            .row {display: flex; justify-content: space-between; margin: 3px 0; }
-                            .total-row {font - size: 14px; font-weight: bold; border-top: 2px solid #000; padding-top: 6px; margin-top: 6px; }
-                            .header {margin - bottom: 12px; }
-                            .footer {margin - top: 12px; font-size: 10px; text-align: center; }
-                            @media print {body {width: 80mm; } button {display: none; } }
-                        </style>
-                </head>
-                <body>
-                    <div class="header center">
-                        <div class="bold" style="font-size:16px;">${biz}</div>
-                        ${bizAddr ? `<div>${bizAddr}</div>` : ''}
-                        ${bizPhone ? `<div>Tel: ${bizPhone}</div>` : ''}
-                        <div class="line"></div>
-                        <div>Comprobante de Venta</div>
-                        <div>Fecha: ${new Date(s.date).toLocaleDateString('es-VE')} ${new Date(s.date).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })}</div>
-                        <div>Ticket #${s.id.toString().slice(-6)}</div>
-                        <div>Cliente: ${clientName}</div>
-                        <div class="line"></div>
-                    </div>
-                    <div class="items">
-                        ${s.items.map(item => `
-                    <div class="row">
-                        <span>${item.name} x${item.qty}</span>
-                        <span>$${((item.priceUSD || 0) * item.qty).toFixed(2)}</span>
-                    </div>
-                    <div style="font-size:10px; color:#555; margin-bottom:3px; padding-left:4px;">
-                        Bs. ${((item.priceUSD || 0) * item.qty * bcvRate).toFixed(2)}
-                    </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Ticket #${s.id}</title>
+            <style>
+                body { 
+                    font-family: 'Segoe UI', Arial, sans-serif; 
+                    max-width: 400px; 
+                    margin: auto; 
+                    padding: 24px; 
+                    color: #1a202c;
+                    line-height: 1.4;
+                }
+                .header { text-align: center; margin-bottom: 24px; border-bottom: 2px solid #edf2f7; padding-bottom: 16px; }
+                .header h2 { margin: 0; color: #2d3748; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; }
+                .header p { margin: 4px 0; font-size: 14px; color: #718096; font-weight: 500; }
+                
+                .detalle { margin: 20px 0; font-size: 14px; }
+                .detalle-item { display: flex; justify-content: space-between; margin-bottom: 8px; }
+                .label { color: #718096; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+                .value { color: #2d3748; font-weight: 700; }
+                
+                hr { border: 0; border-top: 1px dashed #e2e8f0; margin: 16px 0; }
+                
+                .items-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+                .items-table th { text-align: left; font-size: 11px; color: #718096; text-transform: uppercase; padding-bottom: 8px; }
+                .items-table td { padding: 6px 0; font-size: 13px; vertical-align: top; }
+                .qty { font-weight: 700; color: #4a5568; }
+                
+                .total-card { 
+                    background: #2d3748; 
+                    color: white;
+                    padding: 16px; 
+                    border-radius: 12px; 
+                    margin: 16px 0;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                }
+                .total-row { display: flex; justify-content: space-between; align-items: baseline; }
+                .total-label { font-size: 12px; font-weight: 600; text-transform: uppercase; opacity: 0.8; }
+                .total-value-bs { font-size: 24px; font-weight: 800; }
+                .total-value-usd { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+                
+                .payments-section { padding: 12px; background: #f7fafc; border-radius: 8px; font-size: 13px; }
+                
+                .footer { text-align: center; margin-top: 32px; color: #a0aec0; }
+                .footer p { margin: 4px 0; font-size: 12px; font-weight: 500; }
+                
+                .actions { text-align: center; margin-top: 24px; display: flex; gap: 12px; justify-content: center; }
+                button { 
+                    padding: 12px 24px; 
+                    cursor: pointer; 
+                    border-radius: 10px; 
+                    border: none;
+                    font-weight: 700;
+                    font-size: 14px;
+                    transition: all 0.2s;
+                }
+                .btn-print { background: #4f46e5; color: white; display: flex; align-items: center; gap: 8px; }
+                .btn-print:hover { background: #4338ca; transform: translateY(-1px); }
+                .btn-close { background: #e2e8f0; color: #4a5568; }
+                
+                @media print {
+                    .actions { display: none; }
+                    body { padding: 0; }
+                    .total-card { box-shadow: none; border: 1px solid #2d3748; color: #2d3748; background: white; }
+                }
+            </style>
+        </head>
+        <body>
+
+        <div class="header">
+            <h2>${biz}</h2>
+            <p>Comprobante de Venta</p>
+        </div>
+
+        <div class="detalle">
+            <div class="detalle-item">
+                <span class="label">Referencia</span>
+                <span class="value">#${s.id.toString().slice(-8)}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="label">Fecha</span>
+                <span class="value">${formattedDate}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="label">Cliente</span>
+                <span class="value">${clientName}</span>
+            </div>
+        </div>
+
+        <hr>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th width="60%">Descripción</th>
+                    <th width="15%" style="text-align:center;">Cant</th>
+                    <th width="25%" style="text-align:right;">Monto (Bs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${s.items.map(item => `
+                    <tr>
+                        <td>
+                            <div style="font-weight:700; color:#2d3748;">${item.name}</div>
+                            <div style="font-size:11px; color:#718096; margin-top:2px;">$${(item.priceUSD || 0).toFixed(2)} c/u</div>
+                        </td>
+                        <td style="text-align:center;" class="qty">x${item.unit === 'kg' ? item.qty.toFixed(3) : item.qty}</td>
+                        <td style="text-align:right; font-weight:700;">${((item.priceUSD || 0) * item.qty * (s.bcvRate || bcvRate)).toFixed(2)}</td>
+                    </tr>
                 `).join('')}
-                    </div>
-                    <div class="line"></div>
-                    <div class="row"><span>Subtotal USD:</span><span>${UI.formatUSD(s.totalUSD || 0)}</span></div>
-                    <div class="row"><span>Tasa BCV:</span><span>Bs. ${bcvRate.toFixed(2)}</span></div>
-                    <div class="row total-row"><span>TOTAL Bs.:</span><span>Bs. ${(s.totalBS || 0).toFixed(2)}</span></div>
-                    ${s.paymentMethods ? `
-                <div class="line"></div>
-                <div style="font-size:10px; margin-bottom:4px; font-weight:bold;">FORMA DE PAGO:</div>
-                ${s.paymentMethods.movil > 0 ? `<div class="row"><span>Pago Móvil:</span><span>Bs. ${s.paymentMethods.movil.toFixed(2)}</span></div>` : ''}
-                ${s.paymentMethods.debito > 0 ? `<div class="row"><span>Débito:</span><span>Bs. ${s.paymentMethods.debito.toFixed(2)}</span></div>` : ''}
-                ${(s.paymentMethods.cashUSD > 0 || s.paymentMethods['efectivo $'] > 0) ? `<div class="row"><span>Efectivo ($):</span><span>$${(s.paymentMethods['efectivo $'] || s.paymentMethods.cashUSD).toFixed(2)}</span></div>` : ''}
-                ${s.paymentMethods['efectivo Bs'] > 0 ? `<div class="row"><span>Efectivo (Bs):</span><span>Bs. ${s.paymentMethods['efectivo Bs'].toFixed(2)}</span></div>` : ''}
-                ${s.paymentMethods.debt > 0 ? `<div class="row" style="font-weight:bold;"><span>DEUDA:</span><span>Bs. ${s.paymentMethods.debt.toFixed(2)}</span></div>` : ''}
-            ` : ''}
-                    <div class="footer">
-                        <div class="line"></div>
-                        <div>¡Gracias por su compra!</div>
-                        <div style="font-size:9px; margin-top:4px;">Ticket generado por SoluVentas</div>
-                    </div>
-                    <br>
-                        <div class="center">
-                            <button onclick="window.print()" style="padding:8px 20px; cursor:pointer; background:#7c3aed; color:#fff; border:none; border-radius:6px; font-size:13px;">🖨️ Imprimir</button>
-                            <button onclick="window.close()" style="padding:8px 20px; cursor:pointer; background:#e2e8f0; border:none; border-radius:6px; font-size:13px; margin-left:8px;">Cerrar</button>
-                        </div>
-                </body>
-            </html>
+            </tbody>
+        </table>
+
+        <div class="total-card">
+            <div class="total-row">
+                <span class="total-label">Total a Pagar</span>
+                <span class="total-value-bs">Bs. ${(s.totalBS || 0).toFixed(2)}</span>
+            </div>
+            <div class="total-row">
+                <span></span>
+                <span class="total-value-usd">Equivalente: ${UI.formatUSD(s.totalUSD || 0)}</span>
+            </div>
+        </div>
+
+        <div class="payments-section">
+            <div style="font-size: 11px; font-weight: 800; color: #718096; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Desglose de Pago</div>
+            ${Object.entries(s.paymentMethods || {}).filter(([_, v]) => v > 0).map(([k, v]) => `
+                <div class="detalle-item" style="margin-bottom: 4px;">
+                    <span style="text-transform: capitalize; color: #4a5568;">${k}</span>
+                    <span style="font-weight: 700;">${k.includes('$') || k.includes('usd') || k === 'cash' ? UI.formatUSD(v) : UI.formatCurrency(v)}</span>
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="footer">
+            <p>¡Gracias por su preferencia!</p>
+            <p>${biz} - Gestión de Ventas</p>
+            <div class="actions">
+                <button class="btn-print" onclick="window.print()">Imprimir</button>
+                <button class="btn-close" onclick="window.close()">Cerrar</button>
+            </div>
+        </div>
+
+        </body>
+        </html>
     `);
     ticketWin.document.close();
     setTimeout(() => ticketWin.focus(), 200);
+}
+
+function deleteSale(id) {
+    if (!confirm("⚠️ ¿Estás seguro de eliminar esta venta permanentemente?\nEsta acción restará la deuda al cliente y registrará la eliminación en auditoría.")) return;
+
+    const saleIndex = sales.findIndex(s => s.id == id);
+    if (saleIndex === -1) return;
+
+    const sale = sales[saleIndex];
+
+    // 1. Revertir deuda si aplica
+    if (sale.paymentMethods && sale.paymentMethods.debt > 0) {
+        const client = clients.find(c => c.id == sale.clientId);
+        if (client) {
+            client.debt = Math.max(0, client.debt - sale.paymentMethods.debt);
+        }
+    }
+
+    // 2. Opcional: Revertir stock (El usuario no lo pidió pero es lo lógico al anular una venta)
+    sale.items.forEach(item => {
+        if (!item.isService) {
+            const product = products.find(p => p.id == item.id);
+            if (product) product.stock += item.qty;
+        }
+    });
+
+    // 3. Registrar en Auditoría
+    const clientName = clients.find(c => c.id == sale.clientId)?.name || 'General';
+    addLog('eliminacion', `Venta ELIMINADA #${id}. Cliente: ${clientName}. Monto reincorporado: ${UI.formatCurrency(sale.totalBS)}`);
+
+    // 4. Eliminar y guardar
+    sales.splice(saleIndex, 1);
+    saveAll();
+
+    // 5. Refrescar interfaz
+    if (window.location.hash === '#historial') {
+        filterHistorialByDate();
+    } else {
+        renderSection('dashboard');
+    }
+    
+    UI.showToast("Venta eliminada y stock restaurado", "warning");
 }
 
 // --- Configuración del Negocio ---

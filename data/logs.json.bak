@@ -82,5 +82,17 @@
     "date": "2026-04-22T18:57:52.783Z",
     "type": "sistema",
     "message": "Backup automático guardado en el servidor"
+  },
+  {
+    "id": 1776885759347,
+    "date": "2026-04-22T19:22:39.347Z",
+    "type": "venta",
+    "message": "Venta registrada por Bs.S 330,00 ($0.68)"
+  },
+  {
+    "id": 1776886880224,
+    "date": "2026-04-22T19:41:20.224Z",
+    "type": "eliminacion",
+    "message": "Venta ELIMINADA #1776885759347. Cliente: General. Monto reincorporado: Bs.S 330,00"
   }
 ]

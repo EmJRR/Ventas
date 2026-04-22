@@ -73,5 +73,32 @@
     },
     "paymentType": "completo",
     "bcvRate": 481.2177
+  },
+  {
+    "id": 1776885759347,
+    "date": "2026-04-22T19:22:39.347Z",
+    "clientId": 0,
+    "items": [
+      {
+        "id": "srv_avance_1776885756381",
+        "name": "Avance Efec. (Bs S 300,00)",
+        "qty": 1,
+        "priceUSD": 0.6835714578673482,
+        "costUSD": 0.6214285980612256,
+        "isService": true
+      }
+    ],
+    "totalUSD": 0.6835714578673482,
+    "totalBS": 330,
+    "paymentMethods": {
+      "movil": 0,
+      "debito": 330,
+      "efectivo $": 0,
+      "efectivo Bs": 0,
+      "debt": 0
+    },
+    "paymentType": "completo",
+    "bcvRate": 482.7586,
+    "isService": true
   }
 ]
