@@ -76,5 +76,11 @@
     "date": "2026-04-20T15:48:11.959Z",
     "type": "egreso",
     "message": "Nuevo egreso registrado: Pérdida Mercancía por $5.00"
+  },
+  {
+    "id": 1776884272783,
+    "date": "2026-04-22T18:57:52.783Z",
+    "type": "sistema",
+    "message": "Backup automático guardado en el servidor"
   }
 ]

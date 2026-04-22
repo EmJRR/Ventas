@@ -157,6 +157,13 @@ const sidebar = document.getElementById('sidebar');
 const mobileClose = document.getElementById('mobile-close');
 const mobileMore = document.getElementById('mobile-more');
 // Scanner Logic
+let scannerState = {
+    targetId: '',
+    isQuickAdd: false,
+    cameras: [],
+    cameraIndex: 0
+};
+
 UI.startScanning = function (targetId, isQuickAdd = false) {
     const container = document.getElementById('scanner-container');
     const readerDiv = document.getElementById('reader');
@@ -166,27 +173,48 @@ UI.startScanning = function (targetId, isQuickAdd = false) {
     container.style.display = 'block';
     readerDiv.innerHTML = '<div style="height:250px; display:flex; align-items:center; justify-content:center; color:white; flex-direction:column; gap:10px;"><div class="spinner"></div><span>Iniciando Cámara...</span></div>';
 
+    scannerState.targetId = targetId;
+    scannerState.isQuickAdd = isQuickAdd;
+
     setTimeout(() => {
         if (window.html5QrCode) {
-            window.html5QrCode.stop().then(() => startScan(targetId, isQuickAdd)).catch(() => startScan(targetId, isQuickAdd));
+            window.html5QrCode.stop().then(() => startScan()).catch(() => startScan());
         } else {
-            startScan(targetId, isQuickAdd);
+            startScan();
         }
-    }, 500); // 500ms para asegurar renderizado de contenedor
+    }, 500);
 };
 
-async function startScan(targetId, isQuickAdd) {
+async function startScan() {
     const readerDiv = document.getElementById('reader');
+    const switchBtn = document.getElementById('btn-switch-camera');
+    
     try {
-        const cameras = await Html5Qrcode.getCameras();
-        if (!cameras || cameras.length === 0) {
+        if (scannerState.cameras.length === 0) {
+            scannerState.cameras = await Html5Qrcode.getCameras();
+        }
+
+        if (!scannerState.cameras || scannerState.cameras.length === 0) {
             readerDiv.innerHTML = '<p style="color:white; padding:20px;">No se detectaron cámaras.</p>';
             return;
         }
 
-        // Seleccionar preferiblemente la cámara trasera (suele ser la última del array)
-        const backCamera = cameras.find(c => c.label.toLowerCase().includes('back') || c.label.toLowerCase().includes('trasera')) || cameras[cameras.length - 1];
+        // Mostrar botón de cambio si hay más de una cámara
+        if (switchBtn) {
+            switchBtn.style.display = scannerState.cameras.length > 1 ? 'flex' : 'none';
+        }
 
+        // Si es la primera vez, intentar buscar traseras
+        if (scannerState.cameras.length > 1 && scannerState.cameraIndex === 0 && !window.html5QrCode) {
+             const backIdx = scannerState.cameras.findIndex(c => 
+                c.label.toLowerCase().includes('back') || 
+                c.label.toLowerCase().includes('trasera') ||
+                c.label.toLowerCase().includes('environment')
+             );
+             if (backIdx !== -1) scannerState.cameraIndex = backIdx;
+        }
+
+        const selectedCamera = scannerState.cameras[scannerState.cameraIndex];
         const html5QrCode = new Html5Qrcode("reader");
         window.html5QrCode = html5QrCode;
 
@@ -200,12 +228,12 @@ async function startScan(targetId, isQuickAdd) {
         };
 
         await html5QrCode.start(
-            backCamera.id,
+            selectedCamera.id,
             config,
             (decodedText) => {
-                const input = document.getElementById(targetId);
+                const input = document.getElementById(scannerState.targetId);
                 if (input) {
-                    if (isQuickAdd) {
+                    if (scannerState.isQuickAdd) {
                         const prod = products.find(p => p.code.toLowerCase().split(',').map(c => c.trim()).includes(decodedText.toLowerCase()));
                         if (prod) {
                             addToCart(prod.id);
@@ -228,10 +256,26 @@ async function startScan(targetId, isQuickAdd) {
         );
     } catch (e) {
         console.error("Camera error:", e);
-        readerDiv.innerHTML = `<p style="color:#ff6b6b; padding:20px; font-size:0.8rem;">Error: ${e.message || e}<br><br>Si usas IP local, asegúrate de habilitar 'Insecure origins' en chrome://flags</p>`;
+        readerDiv.innerHTML = `<p style="color:#ff6b6b; padding:20px; font-size:0.8rem;">Error: ${e.message || e}</p>`;
         setTimeout(UI.stopScanning, 5000);
     }
 }
+
+UI.switchCamera = function() {
+    if (!window.html5QrCode) return;
+    
+    scannerState.cameraIndex = (scannerState.cameraIndex + 1) % scannerState.cameras.length;
+    
+    UI.showToast("Cambiando cámara...", "info");
+    
+    window.html5QrCode.stop().then(() => {
+        window.html5QrCode = null;
+        startScan();
+    }).catch(err => {
+        console.error("Error stopping for switch:", err);
+        startScan();
+    });
+};
 
 function stopScanAndRestore() {
     if (window.html5QrCode) {
@@ -709,7 +753,12 @@ function renderVentas() {
                 <div class="table-header">
                     <div id="scanner-container" style="display:none; margin-bottom:15px; background:#f8fafc; border-radius:12px; padding:10px; border:2px dashed var(--primary); width: 100%;">
                         <div id="reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="width:100%; margin-top:10px;">Cerrar Cámara</button>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="flex:1;">Cerrar Cámara</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-switch-camera" onclick="UI.switchCamera()" style="flex:1; display:none; align-items:center; justify-content:center; gap:8px;">
+                                <i data-lucide="refresh-cw" style="width:14px;"></i> Cambiar Cámara
+                            </button>
+                        </div>
                     </div>
 
                     <div style="margin-bottom:20px; width: 100%; display: flex; gap: 8px;">
@@ -883,15 +932,11 @@ function showRecargaModal() {
                 <input type="number" id="r-percentage" value="10" step="0.5" required style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); font-size:1rem;">
             </div>
             <div style="margin-bottom:20px;">
-                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Método de Pago Recibido</label>
-                <select id="r-method" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); background:white; font-size:1rem; cursor:pointer;">
-                    <option value="movil">Pago Móvil</option>
-                    <option value="debito">Débito</option>
-                    <option value="efectivo $">Efectivo ($)</option>
-                    <option value="efectivo Bs">Efectivo (Bs)</option>
-                </select>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px; line-height:1.4; text-align:justify;">
+                    * La recarga se agregará al carrito. El sistema calculará el precio final sumando la comisión al monto base.
+                </p>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%; height:50px; font-weight:700;">Procesar Recarga</button>
+            <button type="submit" class="btn btn-primary" style="width:100%; height:50px; font-weight:700;">Agregar Recarga al Carrito</button>
         </form>
     `;
     UI.openModal("Servicio de Recarga", html);
@@ -901,40 +946,28 @@ function showRecargaModal() {
 function processRecarga() {
     const amountBS = UI.parseCurrency(document.getElementById('r-amount-bs').value);
     const percentage = parseFloat(document.getElementById('r-percentage').value) || 0;
-    const method = document.getElementById('r-method').value;
 
     if (amountBS <= 0) return UI.showToast("Monto inválido", "error");
 
     const profitBS = amountBS * (percentage / 100);
-    const totalUSD = amountBS / currentBCVRate;
-    const profitUSD = profitBS / currentBCVRate;
-    const costUSD = totalUSD - profitUSD;
+    const totalBS = amountBS + profitBS;
+    const totalUSD = totalBS / currentBCVRate;
+    const costUSD = amountBS / currentBCVRate;
 
-    const sale = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        clientId: 0,
-        items: [{
-            id: 'srv_recarga',
-            name: 'Recarga Telefónica / Otros',
-            qty: 1,
-            priceUSD: totalUSD,
-            costUSD: costUSD
-        }],
-        totalUSD: totalUSD,
-        totalBS: amountBS,
-        paymentMethods: { [method]: method === 'efectivo $' ? (amountBS / currentBCVRate) : amountBS },
-        paymentType: 'completo',
-        bcvRate: currentBCVRate,
-        isService: true
-    };
+    cart.push({
+        id: 'srv_recarga_' + Date.now(),
+        name: `Recarga (${UI.formatCurrency(amountBS).replace('Bs.', '').trim()})`,
+        qty: 1,
+        priceUSD: totalUSD,
+        costUSD: costUSD,
+        isService: true,
+        unit: 'unid',
+        stock: Infinity
+    });
 
-    sales.push(sale);
-    addLog('servicio', `Recarga realizada por ${UI.formatCurrency(amountBS)} (Ganancia: ${UI.formatCurrency(profitBS)})`);
-    saveAll();
     UI.closeModal();
-    UI.showToast("Recarga registrada con éxito", "success");
-    renderSection('ventas');
+    updateCartUI();
+    UI.showToast("Recarga agregada al carrito", "success");
 }
 
 function showAvanceModal() {
@@ -945,65 +978,46 @@ function showAvanceModal() {
                 <input type="text" id="a-advance-bs" class="currency-input" required placeholder="0,00" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); font-size:1.1rem; color:var(--danger); font-weight:700;">
             </div>
             <div style="margin-bottom:16px;">
-                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Comisión a Cobrar (Bs.)</label>
-                <input type="text" id="a-commission-bs" class="currency-input" required placeholder="0,00" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); color:var(--success); font-weight:700; font-size:1.1rem;">
+                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Comisión a Cobrar (%)</label>
+                <input type="number" id="a-percentage" value="10" step="0.5" required style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); color:var(--success); font-weight:700; font-size:1.1rem;">
             </div>
             <div style="margin-bottom:20px;">
-                <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Método de Recepción del Dinero</label>
-                <select id="a-method" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-color); background:white; font-size:1rem; cursor:pointer;">
-                    <option value="movil">Pago Móvil</option>
-                    <option value="debito">Débito</option>
-                    <option value="efectivo $">Efectivo ($)</option>
-                </select>
-                <p style="font-size:0.7rem; color:var(--text-muted); margin-top:8px; line-height:1.4;">
-                    * El sistema registrará el ingreso total (monto + comisión) y descontará el costo (monto entregado) para reflejar la ganancia exacta.
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px; line-height:1.4; text-align:justify;">
+                    * El avance de efectivo se agregará al carrito. El sistema registrará el ingreso total (monto entregado + % comisión) y descontará el costo (monto entregado) al facturarlo.
                 </p>
             </div>
-            <button type="submit" class="btn btn-success" style="width:100%; height:50px; font-weight:700;">Procesar Avance</button>
+            <button type="submit" class="btn btn-success" style="width:100%; height:50px; font-weight:700;">Agregar Avance al Carrito</button>
         </form>
     `;
     UI.openModal("Avance de Efectivo", html);
     UI.maskCurrency(document.getElementById('a-advance-bs'));
-    UI.maskCurrency(document.getElementById('a-commission-bs'));
 }
 
 function processAvance() {
     const advanceBS = UI.parseCurrency(document.getElementById('a-advance-bs').value);
-    const commissionBS = UI.parseCurrency(document.getElementById('a-commission-bs').value);
-    const method = document.getElementById('a-method').value;
+    const percentage = parseFloat(document.getElementById('a-percentage').value) || 0;
 
     if (advanceBS <= 0) return UI.showToast("Monto de avance inválido", "error");
 
+    const commissionBS = advanceBS * (percentage / 100);
     const totalReceivedBS = advanceBS + commissionBS;
     const totalUSD = totalReceivedBS / currentBCVRate;
-    const profitUSD = commissionBS / currentBCVRate;
     const costUSD = advanceBS / currentBCVRate;
 
-    const sale = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        clientId: 0,
-        items: [{
-            id: 'srv_avance',
-            name: 'Avance de Efectivo',
-            qty: 1,
-            priceUSD: totalUSD,
-            costUSD: costUSD
-        }],
-        totalUSD: totalUSD,
-        totalBS: totalReceivedBS,
-        paymentMethods: { [method]: method === 'efectivo $' ? (totalReceivedBS / currentBCVRate) : totalReceivedBS },
-        paymentType: 'completo',
-        bcvRate: currentBCVRate,
-        isService: true
-    };
+    cart.push({
+        id: 'srv_avance_' + Date.now(),
+        name: `Avance Efec. (Bs ${UI.formatCurrency(advanceBS).replace('Bs.', '').trim()})`,
+        qty: 1,
+        priceUSD: totalUSD,
+        costUSD: costUSD,
+        isService: true,
+        unit: 'unid',
+        stock: Infinity
+    });
 
-    sales.push(sale);
-    addLog('servicio', `Avance de efectivo: Entregado ${UI.formatCurrency(advanceBS)}, Cobrado ${UI.formatCurrency(totalReceivedBS)}`);
-    saveAll();
     UI.closeModal();
-    UI.showToast("Avance registrado con éxito", "success");
-    renderSection('ventas');
+    updateCartUI();
+    UI.showToast("Avance agregado al carrito", "success");
 }
 
 // Función para cambiar de página
@@ -1835,9 +1849,9 @@ function updateCartUI() {
                     <p style="font-size:0.75rem; color:var(--primary); font-weight:700;">${UI.formatCurrency(itemPrice * item.qty * currentBCVRate)}</p>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                     <button class="btn btn-outline btn-sm" onclick="changeQty(${item.id}, -1)">-</button>
-                     <button class="btn btn-outline btn-sm" onclick="changeQty(${item.id}, 1)">+</button>
-                     <button class="btn btn-sm" style="color:var(--danger);" onclick="removeFromCart(${item.id})"><i data-lucide="trash"></i></button>
+                     <button class="btn btn-outline btn-sm" onclick="changeQty('${item.id}', -1)">-</button>
+                     <button class="btn btn-outline btn-sm" onclick="changeQty('${item.id}', 1)">+</button>
+                     <button class="btn btn-sm" style="color:var(--danger);" onclick="removeFromCart('${item.id}')"><i data-lucide="trash"></i></button>
                 </div>
             </div>
         `;
@@ -1849,16 +1863,27 @@ function updateCartUI() {
 
 function changeQty(id, delta) {
     const item = cart.find(i => i.id == id);
-    const product = products.find(p => p.id == id);
-    if (item) {
-        const step = item.unit === 'kg' ? 0.1 : 1;
-        const newQty = item.qty + (delta * step);
-        if (newQty > 0 && newQty <= product.stock) {
+    if (!item) return;
+
+    if (item.isService) {
+        const newQty = item.qty + delta;
+        if (newQty > 0) {
             item.qty = newQty;
-        } else if (newQty > product.stock) {
-            UI.showToast("Stock insuficiente", "error");
-        } else if (newQty <= 0) {
+        } else {
             removeFromCart(id);
+        }
+    } else {
+        const product = products.find(p => p.id == id);
+        if (product) {
+            const step = item.unit === 'kg' ? 0.1 : 1;
+            const newQty = item.qty + (delta * step);
+            if (newQty > 0 && newQty <= product.stock) {
+                item.qty = newQty;
+            } else if (newQty > product.stock) {
+                UI.showToast("Stock insuficiente", "error");
+            } else if (newQty <= 0) {
+                removeFromCart(id);
+            }
         }
     }
     updateCartUI();
@@ -1999,14 +2024,18 @@ function completeSale(targetTotalBS) {
 
     // Check stock one last time
     for (const item of cart) {
+        if (item.isService) continue;
         const p = products.find(prod => prod.id == item.id);
-        if (p.stock < item.qty) {
+        if (p && p.stock < item.qty) {
             UI.showToast(`Stock insuficiente de ${p.name} `, "error");
             return;
         }
     }
 
     const totalUSD = cart.reduce((acc, item) => acc + ((item.priceUSD || 0) * item.qty), 0);
+
+    // Filter to check if purely services
+    const onlyServices = cart.length > 0 && cart.every(i => i.isService);
 
     // Process Sale
     const sale = {
@@ -2018,7 +2047,8 @@ function completeSale(targetTotalBS) {
             name: item.name,
             qty: item.qty,
             priceUSD: item.priceUSD,
-            costUSD: item.costUSD || (item.priceUSD * 0.8)
+            costUSD: item.costUSD || (item.priceUSD * 0.8),
+            isService: item.isService || false
         })),
         totalUSD: totalUSD,
         totalBS: targetTotalBS,
@@ -2030,13 +2060,15 @@ function completeSale(targetTotalBS) {
             debt: payDebt
         },
         paymentType: payDebt > 0 ? 'mixto/deuda' : 'completo',
-        bcvRate: currentBCVRate
+        bcvRate: currentBCVRate,
+        isService: onlyServices
     };
 
     // Update Stock
     cart.forEach(item => {
+        if (item.isService) return;
         const p = products.find(prod => prod.id == item.id);
-        p.stock -= item.qty;
+        if (p) p.stock -= item.qty;
     });
 
     // Update Debt if deudor
@@ -2064,7 +2096,12 @@ function showAddProductModal() {
         <form id="product-form" onsubmit="event.preventDefault(); saveProduct()">
             <div id="scanner-container" style="display:none; margin-bottom:15px; background:#f8fafc; border-radius:12px; padding:10px; border:2px dashed var(--primary);">
                 <div id="reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
-                <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="width:100%; margin-top:10px;">Cerrar Cámara</button>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="flex:1;">Cerrar Cámara</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-switch-camera" onclick="UI.switchCamera()" style="flex:1; display:none; align-items:center; justify-content:center; gap:8px;">
+                        <i data-lucide="refresh-cw" style="width:14px;"></i> Cambiar Cámara
+                    </button>
+                </div>
             </div>
             
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -2130,7 +2167,12 @@ function showEditProductModal(id) {
         <form id="edit-product-form" onsubmit="event.preventDefault(); updateProduct(${id})">
             <div id="scanner-container" style="display:none; margin-bottom:15px; background:#f8fafc; border-radius:12px; padding:10px; border:2px dashed var(--primary);">
                 <div id="reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
-                <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="width:100%; margin-top:10px;">Cerrar Cámara</button>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="UI.stopScanning()" style="flex:1;">Cerrar Cámara</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-switch-camera" onclick="UI.switchCamera()" style="flex:1; display:none; align-items:center; justify-content:center; gap:8px;">
+                        <i data-lucide="refresh-cw" style="width:14px;"></i> Cambiar Cámara
+                    </button>
+                </div>
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
