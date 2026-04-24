@@ -1,5 +1,16 @@
 /* utils.js - Common UI helper functions */
 const UI = {
+    // Helper to get Date in GMT-4 (America/Caracas)
+    getGMTDate: () => {
+        return new Date(new Date().toLocaleString("en-US", {timeZone: "America/Caracas"}));
+    },
+    getGMTDateString: () => {
+        const d = UI.getGMTDate();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    },
+    getGMTISOString: () => {
+        return UI.getGMTDate().toISOString();
+    },
     // Show toast notification
     showToast: (message, type = 'success') => {
         const container = document.getElementById('toast-container');
@@ -139,7 +150,8 @@ const UI = {
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            second: '2-digit'
         });
     },
 
@@ -256,8 +268,9 @@ toastStyle.textContent = `
         align-items: center;
         gap: 12px;
         padding: 16px 24px;
-        background-color: #fff;
-        border-radius: var(--border-radius);
+        background-color: var(--bg-surface);
+        color: var(--text-main);
+        border-radius: var(--border-radius-sm);
         box-shadow: var(--shadow-lg);
         border-left: 4px solid var(--primary);
         animation: slideInRight 0.3s ease;

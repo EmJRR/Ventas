@@ -1,3 +1,9 @@
 {
-  "lowStockThreshold": 5
+  "lowStockThreshold": 5,
+  "businessName": "SoluVentas",
+  "businessRIF": "",
+  "businessPhone": "",
+  "businessAddress": "",
+  "enableSellers": true,
+  "theme": "theme-dark"
 }

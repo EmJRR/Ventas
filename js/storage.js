@@ -9,6 +9,7 @@ const Storage = {
         payments: [],
         egresos: [],
         logs: [],
+        sellers: [],
         settings: { lowStockThreshold: 5 }
     },
 

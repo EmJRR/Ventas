@@ -1,7 +1,7 @@
 /* app.js - Main Application Logic */
 
 // Global State (Reemplazados por inicialización asíncrona)
-let products, clients, sales, payments, egresos, logs, settings, currentBCVRate;
+let products, clients, sales, payments, egresos, logs, settings, currentBCVRate, sellers;
 
 async function bootstrapApp() {
     const isOnline = await Storage.init();
@@ -13,6 +13,7 @@ async function bootstrapApp() {
     payments = Storage.get('payments');
     egresos = Storage.get('egresos');
     logs = Storage.get('logs');
+    sellers = Storage.get('sellers');
     settings = Storage.get('settings') || { lowStockThreshold: 5, businessName: 'SoluVentas', businessRIF: '', businessPhone: '', businessAddress: '' };
     currentBCVRate = parseFloat(localStorage.getItem('soluventas_manual_bcv')) || 45.0;
 
@@ -22,6 +23,15 @@ async function bootstrapApp() {
     } else {
         // Si no está online, mostramos el modal de error/aviso
         setTimeout(() => UI.showSyncError(), 1000);
+    }
+
+    // Aplicar configuración visual
+    if (settings.businessName) {
+        const logoText = document.getElementById('business-logo-text');
+        if (logoText) logoText.textContent = settings.businessName;
+    }
+    if (settings.theme) {
+        document.body.className = settings.theme;
     }
 
     // Inicializar UI y Eventos
@@ -39,8 +49,8 @@ async function bootstrapApp() {
 function checkAutoBackup() {
     const lastBackup = localStorage.getItem('soluventas_last_backup');
     const now = Date.now();
-    const ONE_DAY = 24 * 60 * 60 * 1000;
-    if (!lastBackup || (now - parseInt(lastBackup)) > ONE_DAY) {
+    const SIX_HOURS = 6 * 60 * 60 * 1000;
+    if (!lastBackup || (now - parseInt(lastBackup)) > SIX_HOURS) {
         setTimeout(performAutoBackup, 3000);
     }
 }
@@ -49,13 +59,14 @@ function performAutoBackup(isManual = false) {
     try {
         const backupData = {
             version: '2.0',
-            timestamp: new Date().toISOString(),
+            timestamp: UI.getGMTISOString(),
             products: Storage.get('products'),
             clients: Storage.get('clients'),
             sales: Storage.get('sales'),
             payments: Storage.get('payments'),
             egresos: Storage.get('egresos'),
             logs: Storage.get('logs'),
+            sellers: Storage.get('sellers'),
             settings: Storage.get('settings')
         };
         const json = JSON.stringify(backupData, null, 2);
@@ -65,7 +76,7 @@ function performAutoBackup(isManual = false) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `soluventas_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `soluventas_backup_${UI.getGMTDateString()}.json`;
             a.click();
             URL.revokeObjectURL(url);
             UI.showToast('Respaldo descargado', 'success');
@@ -116,7 +127,7 @@ async function restoreBackup(file) {
             // Agregar log de restauración
             logs.push({
                 id: Date.now(),
-                date: new Date().toISOString(),
+                date: UI.getGMTISOString(),
                 type: 'sistema',
                 message: `Restauración de backup aplicada: ${backupDate}`
             });
@@ -143,7 +154,7 @@ async function restoreBackup(file) {
 function addLog(type, message) {
     logs.push({
         id: Date.now(),
-        date: new Date().toISOString(),
+        date: UI.getGMTISOString(),
         type: type,
         message: message
     });
@@ -470,7 +481,7 @@ function exportLogsCSV() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `auditoria_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `auditoria_${UI.getGMTDateString()}.csv`;
     a.click();
 }
 
@@ -490,9 +501,9 @@ function renderDashboard() {
             <div class="stat-card">
                 <div class="stat-icon purple"><i data-lucide="trending-up"></i></div>
                 <div class="stat-info">
-                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">VENTAS TOTALES</h3>
-                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">${UI.formatUSD(totalSalesUSD)}</p>
-                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalSalesBS)}</span>
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">CAPITAL DISPONIBLE</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">${UI.formatUSD(totalSalesUSD - totalDebtUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalSalesBS - totalDebt)}</span>
                 </div>
             </div>
             <div class="stat-card">
@@ -506,7 +517,7 @@ function renderDashboard() {
             <div class="stat-card">
                 <div class="stat-icon blue"><i data-lucide="briefcase"></i></div>
                 <div class="stat-info">
-                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">INVERSIÓN TOTAL</h3>
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">VALOR EN MERCANCÍA</h3>
                     <p style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">${UI.formatUSD(totalInvestmentUSD)}</p>
                     <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(totalInvestmentBS)}</span>
                 </div>
@@ -676,9 +687,14 @@ function renderInventario() {
                 <div class="search-container" style="flex: 1; min-width: 200px;">
                     <input type="text" placeholder="🔍 Filtrar productos..." id="inventory-search" style="width:100%; padding:12px 16px; border-radius:12px; border:1px solid var(--border-color); font-size:0.95rem; box-shadow:var(--shadow-sm);">
                 </div>
-                <button class="btn btn-primary" onclick="showAddProductModal()" style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
-                    <i data-lucide="plus" style="width: 18px; height: 18px;"></i> Agregar Producto
-                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-outline" onclick="showBulkImportModal()" style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                        <i data-lucide="file-spreadsheet" style="width: 18px; height: 18px;"></i> Carga Masiva
+                    </button>
+                    <button class="btn btn-primary" onclick="showAddProductModal()" style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                        <i data-lucide="plus" style="width: 18px; height: 18px;"></i> Agregar Producto
+                    </button>
+                </div>
             </div>
             
             <!-- IMPORTANTE: NO usar overflow-x auto aquí para que funcione el responsive -->
@@ -828,9 +844,25 @@ function renderVentas() {
                 </div>
                 <div class="table-header" style="padding-top:0;"><h3>Carrito</h3></div>
                 
-                <div class="cart-items" id="cart-items-list" style="flex: 1; min-height: 300px; max-height: 500px; overflow-y: auto;">
+                <div class="cart-items" id="cart-items-list" style="flex: 1; min-height: 250px; max-height: 400px; overflow-y: auto;">
                     <p style="text-align:center; color:var(--text-muted); padding: 20px;">El carrito está vacío</p>
                 </div>
+
+                <!-- Selección de Vendedor -->
+                ${settings.enableSellers !== false ? `
+                <div style="padding:15px; border-top:1px solid var(--border-color); background:rgba(0,0,0,0.05);">
+                    <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Vendedor Asignado</label>
+                    <select id="sale-seller-id" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main);">
+                        <option value="">Sin Vendedor</option>
+                        ${sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                    </select>
+                    ${sellers.length === 0 ? `
+                        <div style="margin-top:8px; color:var(--danger); font-size:0.75rem;">
+                            ⚠️ No hay otros vendedores registrados. <a href="#configuracion" style="color:var(--danger); font-weight:700;">Configurar</a>
+                        </div>
+                    ` : ''}
+                </div>
+                ` : ''}
 
                 <div class="cart-footer" style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 20px;">
                     <div class="checkout-form" style="display:flex; flex-direction:column; gap:16px;">
@@ -1176,13 +1208,13 @@ function exportClientesCSV() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `clientes_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `clientes_${UI.getGMTDateString()}.csv`;
     a.click();
 }
 
 // 5. Historial Logic
 function renderHistorial() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = UI.getGMTDateString();
 
     contentArea.innerHTML = `
         <div class="filter-panel" style="padding:20px; background:var(--bg-surface); border-radius:var(--border-radius-lg); margin-bottom:24px; border:1px solid var(--border-color); display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
@@ -1386,7 +1418,7 @@ function filterHistorialByDate() {
 
 // 6. Egresos Logic
 function renderEgresos() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = UI.getGMTDateString();
     contentArea.innerHTML = `
         <div class="filter-panel" style="padding:20px; background:var(--bg-surface); border-radius:var(--border-radius-lg); margin-bottom:24px; border:1px solid var(--border-color); display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
             <div style="flex:1; min-width:140px;">
@@ -1452,27 +1484,27 @@ function filterNeteoByDate() {
         return d >= from && d <= to;
     });
 
-    // Cálculos de Neteo
+    // Cálculos de Neteo basados en Capital Disponible (Liquidez Final)
     const totalSalesUSD = filteredSales.reduce((acc, s) => acc + (s.totalUSD || 0), 0);
-    const totalCostUSD = filteredSales.reduce((acc, s) => acc + s.items.reduce((sum, i) => sum + ((i.costUSD || 0) * i.qty), 0), 0);
-    const grossProfitUSD = totalSalesUSD - totalCostUSD;
+    const totalDebtUSD = filteredSales.reduce((acc, s) => acc + ((s.paymentMethods?.debt || 0) / (s.bcvRate || currentBCVRate)), 0);
+    const totalCollectedUSD = totalSalesUSD - totalDebtUSD;
     
     const totalEgresosUSD = filteredEgresos.reduce((acc, e) => acc + (e.amountUSD || 0), 0);
     const totalEgresosBS = filteredEgresos.reduce((acc, e) => acc + (e.amountBS || 0), 0);
     
-    const netProfitUSD = grossProfitUSD - totalEgresosUSD;
-    const netProfitBS = netProfitUSD * currentBCVRate;
+    const availableCapitalUSD = totalCollectedUSD - totalEgresosUSD;
+    const availableCapitalBS = availableCapitalUSD * currentBCVRate;
 
     metricsPanel.innerHTML = `
         <div class="dashboard-stats" style="margin-bottom:24px;">
             <div class="stat-card">
-                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
-                    <i data-lucide="trending-up"></i>
+                <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                    <i data-lucide="wallet"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">GANANCIA VENTAS</h3>
-                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--success);">${UI.formatUSD(grossProfitUSD)}</p>
-                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Utilidad Bruta</span>
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">CAPITAL DISPONIBLE</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">${UI.formatUSD(availableCapitalUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Saldo en Caja Final</span>
                 </div>
             </div>
             <div class="stat-card">
@@ -1486,13 +1518,13 @@ function filterNeteoByDate() {
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon" style="background: ${netProfitUSD >= 0 ? 'rgba(99, 102, 241, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${netProfitUSD >= 0 ? 'var(--primary)' : 'var(--danger)'};">
-                    <i data-lucide="calculator"></i>
+                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                    <i data-lucide="trending-up"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">NETEO FINAL</h3>
-                    <p style="font-weight: 800; font-size: 1.6rem; color: ${netProfitUSD >= 0 ? 'var(--primary)' : 'var(--danger)'};">${UI.formatUSD(netProfitUSD)}</p>
-                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">${UI.formatCurrency(netProfitBS)}</span>
+                    <h3 style="margin-bottom: 4px; font-size: 0.75rem;">VENTAS COBRADAS</h3>
+                    <p style="font-weight: 800; font-size: 1.6rem; color: var(--success);">${UI.formatUSD(totalCollectedUSD)}</p>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Ingreso Bruto (Sin Deudas)</span>
                 </div>
             </div>
         </div>
@@ -2059,17 +2091,21 @@ function completeSale(targetTotalBS) {
     // Filter to check if purely services
     const onlyServices = cart.length > 0 && cart.every(i => i.isService);
 
+    const sellerVal = document.getElementById('sale-seller-id')?.value;
+    const sellerId = (settings.enableSellers !== false && sellerVal && sellerVal !== "") ? parseInt(sellerVal) : null;
+
     // Process Sale
     const sale = {
         id: Date.now(),
-        date: new Date().toISOString(),
+        date: UI.getGMTISOString(),
         clientId: clientId,
+        sellerId: sellerId,
         items: cart.map(item => ({
             id: item.id,
             name: item.name,
             qty: item.qty,
             priceUSD: item.priceUSD,
-            costUSD: item.costUSD || (item.priceUSD * 0.8),
+            costUSD: item.costUSD || 0,
             isService: item.isService || false
         })),
         totalUSD: totalUSD,
@@ -2077,8 +2113,8 @@ function completeSale(targetTotalBS) {
         paymentMethods: {
             movil: payMovil,
             debito: payDebito,
-            'efectivo $': payCashUSD,
-            'efectivo Bs': payCashBS,
+            cashUSD: payCashUSD,
+            cashBS: payCashBS,
             debt: payDebt
         },
         paymentType: payDebt > 0 ? 'mixto/deuda' : 'completo',
@@ -2251,6 +2287,173 @@ function deleteProduct(id) {
     }
 }
 
+// --- Bulk Import Logic ---
+function showBulkImportModal() {
+    UI.openModal("Carga Masiva desde Excel", `
+        <div style="text-align:center; padding:10px;">
+            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:20px;">
+                El archivo debe contener las columnas: <br>
+                <strong>Código, Producto, Precio Base, Cantidad</strong>
+            </p>
+            
+            <div id="import-dropzone" style="border: 2px dashed var(--primary); border-radius:15px; padding:40px 20px; cursor:pointer; background:rgba(99, 102, 241, 0.05); transition:0.3s;" 
+                 onclick="document.getElementById('import-file').click()">
+                <i data-lucide="upload-cloud" style="width:48px; height:48px; color:var(--primary); margin-bottom:12px;"></i>
+                <p style="font-weight:700; color:var(--primary);">Haz clic o arrastra el archivo aquí</p>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Formatos soportados: .xlsx, .xls, .csv</p>
+            </div>
+            
+            <input type="file" id="import-file" accept=".xlsx, .xls, .csv" style="display:none;" onchange="handleImportFile(this)">
+            
+            <div id="import-preview" style="display:none; margin-top:24px; text-align:left;">
+                <div style="background:var(--bg-main); border-radius:12px; padding:16px; margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h4 style="font-size:0.9rem;">Vista Previa (<span id="import-count">0</span> productos)</h4>
+                        <button class="btn btn-sm btn-outline" style="color:var(--danger);" onclick="resetImport()">Cancelar</button>
+                    </div>
+                    <div style="max-height:200px; overflow-y:auto; font-size:0.8rem; border:1px solid var(--border-color); border-radius:8px;">
+                        <table class="premium-table" style="margin:0;">
+                            <thead>
+                                <tr><th>Código</th><th>Nombre</th><th>Costo</th><th>Stock</th></tr>
+                            </thead>
+                            <tbody id="import-preview-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:8px;">Porcentaje de Ganancia Global (%)</label>
+                    <input type="number" id="import-margin" value="20" min="0" style="width:100%; padding:12px; border-radius:10px; border:2px solid var(--primary); font-size:1.1rem; font-weight:700;">
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin-top:6px;">Este porcentaje se aplicará al "Precio Base" para calcular el precio de venta final.</p>
+                </div>
+                
+                <button class="btn btn-primary" id="btn-confirm-import" style="width:100%; height:55px; font-weight:800; font-size:1.1rem;" onclick="processBulkImport()">
+                    Confirmar e Importar Inventario
+                </button>
+            </div>
+        </div>
+    `);
+    lucide.createIcons();
+}
+
+let pendingImportData = [];
+
+function handleImportFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(firstSheet);
+
+            if (json.length === 0) throw new Error("El archivo está vacío");
+
+            // Mapeo flexible de columnas basado en el formato solicitado
+            pendingImportData = json.map(row => {
+                return {
+                    code: String(row['Código'] || row['Codigo'] || row['CODIGO'] || row['Code'] || '').trim(),
+                    name: String(row['Producto'] || row['Descripción'] || row['Descripcion'] || row['Product'] || 'Sin nombre').trim(),
+                    cost: parseFloat(String(row['Precio Base'] || row['Precio'] || row['Costo'] || row['Base Price'] || 0).replace(',', '.')),
+                    stock: parseFloat(String(row['Cantidad'] || row['Stock'] || row['Qty'] || 0).replace(',', '.'))
+                };
+            }).filter(item => item.name !== 'Sin nombre' && item.code !== '');
+
+            if (pendingImportData.length === 0) throw new Error("No se encontraron productos válidos");
+
+            // Mostrar Preview
+            document.getElementById('import-dropzone').style.display = 'none';
+            const preview = document.getElementById('import-preview');
+            preview.style.display = 'block';
+            document.getElementById('import-count').textContent = pendingImportData.length;
+            
+            const tbody = document.getElementById('import-preview-body');
+            tbody.innerHTML = pendingImportData.slice(0, 10).map(p => `
+                <tr>
+                    <td>${p.code}</td>
+                    <td>${p.name}</td>
+                    <td>$${p.cost.toFixed(2)}</td>
+                    <td>${p.stock}</td>
+                </tr>
+            `).join('') + (pendingImportData.length > 10 ? `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">... y ${pendingImportData.length - 10} más ...</td></tr>` : '');
+
+        } catch (err) {
+            console.error("Import error:", err);
+            UI.showToast("Error al leer Excel: " + err.message, "error");
+            input.value = '';
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function resetImport() {
+    pendingImportData = [];
+    document.getElementById('import-dropzone').style.display = 'block';
+    document.getElementById('import-preview').style.display = 'none';
+    document.getElementById('import-file').value = '';
+}
+
+function processBulkImport() {
+    const margin = parseFloat(document.getElementById('import-margin').value) || 0;
+    const btn = document.getElementById('btn-confirm-import');
+    
+    if (confirm(`¿Deseas importar ${pendingImportData.length} productos con un ${margin}% de ganancia?`)) {
+        btn.disabled = true;
+        btn.textContent = "Procesando...";
+        
+        try {
+            const timestamp = Date.now();
+            let addedCount = 0;
+            let updatedCount = 0;
+
+            pendingImportData.forEach((p, index) => {
+                const priceUSD = p.cost + (p.cost * (margin / 100));
+                
+                // Buscar si ya existe por código
+                const existingProduct = products.find(prod => 
+                    prod.code.toString().split(',').map(c => c.trim()).includes(p.code.toString().trim())
+                );
+
+                if (existingProduct) {
+                    // Actualizar existente
+                    existingProduct.stock += p.stock;
+                    existingProduct.costUSD = p.cost;
+                    existingProduct.priceUSD = priceUSD;
+                    existingProduct.profitMargin = margin;
+                    updatedCount++;
+                } else {
+                    // Agregar nuevo
+                    products.push({
+                        id: timestamp + index,
+                        code: p.code.toString(),
+                        name: p.name,
+                        costUSD: p.cost,
+                        profitMargin: margin,
+                        priceUSD: priceUSD,
+                        unit: 'unid',
+                        stock: p.stock
+                    });
+                    addedCount++;
+                }
+            });
+            
+            saveAll();
+            addLog('inventario', `Importación masiva: ${addedCount} nuevos, ${updatedCount} actualizados.`);
+            
+            UI.showToast(`¡Éxito! ${addedCount} nuevos y ${updatedCount} actualizados`, "success");
+            UI.closeModal();
+            renderInventario();
+        } catch (err) {
+            UI.showToast("Error al procesar importación", "error");
+            btn.disabled = false;
+            btn.textContent = "Confirmar e Importar Inventario";
+        }
+    }
+}
+
 // --- Debt Actions ---
 function showAbonoModal(clientId) {
     const client = clients.find(c => c.id == clientId);
@@ -2369,7 +2572,7 @@ function saveAbonoMixed(clientId) {
     client.debt -= effectiveAbono;
 
     // Registrar los pagos realizados
-    const now = new Date().toISOString();
+    const now = UI.getGMTISOString();
     if (movil > 0) payments.push({ id: Date.now() + 1, clientId, amount: movil, method: 'Pago Móvil', bcvRate: currentBCVRate, date: now });
     if (debito > 0) payments.push({ id: Date.now() + 2, clientId, amount: debito, method: 'Débito', bcvRate: currentBCVRate, date: now });
     if (cashUSD > 0) payments.push({ id: Date.now() + 3, clientId, amount: cashUSD * currentBCVRate, method: 'Efectivo ($)', bcvRate: currentBCVRate, date: now });
@@ -2404,7 +2607,7 @@ function saveClient() {
         email: document.getElementById('c-email').value,
         address: document.getElementById('c-address')?.value || '',
         debt: 0,
-        createdAt: new Date().toISOString()
+        createdAt: UI.getGMTISOString()
     };
     clients.push(client);
     addLog('cliente', `Nuevo cliente registrado: ${client.name} `);
@@ -2531,6 +2734,7 @@ async function saveAll() {
             Storage.save('payments', payments),
             Storage.save('egresos', egresos),
             Storage.save('logs', logs),
+            Storage.save('sellers', sellers),
             Storage.save('settings', settings)
         ]);
         updateGlobalAlerts();
@@ -2986,6 +3190,24 @@ function renderConfiguracion() {
                 </div>
             </div>
 
+            <!-- Validación de Hora -->
+            <div class="data-table-container" style="margin-bottom:24px; padding:20px; background:rgba(99, 102, 241, 0.05); border:1px solid var(--border-color); border-radius:15px; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div style="background:var(--primary); color:white; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(99, 102, 241, 0.3);">
+                        <i data-lucide="clock" style="width:24px; height:24px;"></i>
+                    </div>
+                    <div>
+                        <h4 style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Hora del Sistema (GMT-4)</h4>
+                        <p id="config-system-time" style="font-size:1.2rem; font-weight:800; color:var(--text-main); margin:0;">
+                            ${UI.formatDate(UI.getGMTISOString())}
+                        </p>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <span class="badge bg-success" style="font-size:0.7rem;">Sincronizado</span>
+                </div>
+            </div>
+
             <div class="data-table-container" style="margin-bottom:24px;">
                 <div class="table-header"><h3><i data-lucide="building-2" style="width:18px;"></i> Datos del Negocio</h3></div>
                 <form onsubmit="event.preventDefault(); saveBusinessSettings()" class="config-grid">
@@ -3014,9 +3236,87 @@ function renderConfiguracion() {
                         <input type="text" id="cfg-manual-bcv" class="currency-input" value="${currentBCVRate.toFixed(2).replace('.', ',')}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color);">
                     </div>
                     <div style="grid-column:1/-1;">
+                        <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:12px;">Paleta de Colores</label>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                            <label class="theme-option" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                                <input type="radio" name="theme-select" value="" ${!settings.theme ? 'checked' : ''} style="display:none;">
+                                <div class="theme-preview" style="width:40px; height:40px; border-radius:10px; background:#6366f1; border:2px solid #fff; box-shadow:0 0 0 2px #ccc;"></div>
+                                <span style="font-size:0.7rem; font-weight:600;">Default</span>
+                            </label>
+                            <label class="theme-option" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                                <input type="radio" name="theme-select" value="theme-emerald" ${settings.theme === 'theme-emerald' ? 'checked' : ''} style="display:none;">
+                                <div class="theme-preview" style="width:40px; height:40px; border-radius:10px; background:#10b981; border:2px solid #fff;"></div>
+                                <span style="font-size:0.7rem; font-weight:600;">Emerald</span>
+                            </label>
+                            <label class="theme-option" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                                <input type="radio" name="theme-select" value="theme-purple" ${settings.theme === 'theme-purple' ? 'checked' : ''} style="display:none;">
+                                <div class="theme-preview" style="width:40px; height:40px; border-radius:10px; background:#8b5cf6; border:2px solid #fff;"></div>
+                                <span style="font-size:0.7rem; font-weight:600;">Purple</span>
+                            </label>
+                            <label class="theme-option" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                                <input type="radio" name="theme-select" value="theme-orange" ${settings.theme === 'theme-orange' ? 'checked' : ''} style="display:none;">
+                                <div class="theme-preview" style="width:40px; height:40px; border-radius:10px; background:#f59e0b; border:2px solid #fff;"></div>
+                                <span style="font-size:0.7rem; font-weight:600;">Orange</span>
+                            </label>
+                            <label class="theme-option" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                                <input type="radio" name="theme-select" value="theme-rose" ${settings.theme === 'theme-rose' ? 'checked' : ''} style="display:none;">
+                                <div class="theme-preview" style="width:40px; height:40px; border-radius:10px; background:#f43f5e; border:2px solid #fff;"></div>
+                                <span style="font-size:0.7rem; font-weight:600;">Rose</span>
+                            </label>
+                            <label class="theme-option" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                                <input type="radio" name="theme-select" value="theme-dark" ${settings.theme === 'theme-dark' ? 'checked' : ''} style="display:none;">
+                                <div class="theme-preview" style="width:40px; height:40px; border-radius:10px; background:#1e293b; border:2px solid #fff;"></div>
+                                <span style="font-size:0.7rem; font-weight:600;">Dark</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="grid-column:1/-1; margin-top:10px; padding:15px; border-radius:12px; background:rgba(0,0,0,0.05); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
+                        <div>
+                            <label style="font-size:0.9rem; font-weight:700; display:block;">Activar Gestión de Vendedores</label>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">Habilita la asignación de ventas y cálculo de comisiones por vendedor</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="cfg-enable-sellers" ${settings.enableSellers !== false ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div style="grid-column:1/-1;">
                         <button type="submit" class="btn btn-primary" style="width:100%;"><i data-lucide="save"></i> Guardar Configuración</button>
                     </div>
                 </form>
+            </div>
+
+            <div class="data-table-container" style="margin-bottom:24px;">
+                <div class="table-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3><i data-lucide="users" style="width:18px;"></i> Gestión de Vendedores</h3>
+                    <button class="btn btn-primary btn-sm" onclick="showAddSellerModal()"><i data-lucide="plus"></i> Nuevo</button>
+                </div>
+                <div style="padding:15px;">
+                    <div id="sellers-list-container">
+                        ${sellers.length === 0 ? '<p style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:20px;">No hay vendedores registrados</p>' : `
+                            <table style="width:100%; font-size:0.85rem;">
+                                <thead style="text-align:left; color:var(--text-muted);">
+                                    <tr>
+                                        <th style="padding:8px;">Nombre</th>
+                                        <th style="padding:8px;">Comisión (%)</th>
+                                        <th style="padding:8px; text-align:right;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${sellers.map(s => `
+                                        <tr style="border-top:1px solid var(--border-color);">
+                                            <td style="padding:10px;">${s.name}</td>
+                                            <td style="padding:10px;">${s.commission}%</td>
+                                            <td style="padding:10px; text-align:right;">
+                                                <button class="btn btn-outline btn-sm" onclick="deleteSeller(${s.id})" style="color:var(--danger); border-color:var(--danger);"><i data-lucide="trash-2"></i></button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `}
+                    </div>
+                </div>
             </div>
 
             <div class="data-table-container" style="margin-bottom:24px;">
@@ -3055,6 +3355,17 @@ function renderConfiguracion() {
         `;
     lucide.createIcons();
     contentArea.querySelectorAll('.currency-input').forEach(input => UI.maskCurrency(input));
+
+    // Reloj dinámico para validar zona horaria
+    if (window.cfgClockInt) clearInterval(window.cfgClockInt);
+    window.cfgClockInt = setInterval(() => {
+        const timeEl = document.getElementById('config-system-time');
+        if (timeEl) {
+            timeEl.textContent = UI.formatDate(UI.getGMTISOString());
+        } else {
+            clearInterval(window.cfgClockInt);
+        }
+    }, 1000);
 }
 
 function saveBusinessSettings() {
@@ -3063,6 +3374,16 @@ function saveBusinessSettings() {
     settings.businessPhone = document.getElementById('cfg-biz-phone').value;
     settings.businessAddress = document.getElementById('cfg-biz-addr').value;
     settings.lowStockThreshold = parseInt(document.getElementById('cfg-stock-threshold').value) || 5;
+    settings.enableSellers = document.getElementById('cfg-enable-sellers').checked;
+
+    // Tema
+    const selectedTheme = document.querySelector('input[name="theme-select"]:checked')?.value || '';
+    settings.theme = selectedTheme;
+    document.body.className = selectedTheme;
+
+    // Actualizar nombre en la interfaz inmediatamente
+    const logoText = document.getElementById('business-logo-text');
+    if (logoText) logoText.textContent = settings.businessName;
 
     // Actualización manual del dólar
     const manualRate = UI.parseCurrency(document.getElementById('cfg-manual-bcv').value);
@@ -3090,35 +3411,57 @@ function exportToCSV() {
         movil: 0,
         debito: 0,
         cashUSD: 0,
+        cashBS: 0,
         debt: 0
     };
     let totalGlobalUSD = 0;
     let totalGlobalBS = 0;
 
+    // Acumulado de comisiones por vendedor
+    const sellerCommissions = {};
+
     // Encabezado con BOM y columnas desglosadas
-    let csv = "\uFEFFFecha;Cliente;Total USD;Total BS;Pago Movil (Bs);Debito (Bs);Efectivo ($);Deuda (Bs);Tipo\n";
+    let csv = "\uFEFFFecha;Cliente;Vendedor;Total USD;Total BS;Pago Movil (Bs);Debito (Bs);Efectivo ($);Efectivo (Bs);Deuda (Bs);Comision ($);Tipo\n";
     
     sales.forEach(s => {
         const clientName = clients.find(c => c.id == s.clientId)?.name || 'General';
+        const seller = sellers.find(sel => sel.id == s.sellerId);
+        const sellerName = seller ? seller.name : 'N/A';
+        const commissionPct = seller ? (seller.commission || 0) : 0;
+        
         const usd = parseFloat(s.totalUSD) || 0;
         const bs = parseFloat(s.totalBS) || 0;
+        
+        // Calcular comisión sobre las GANANCIAS (Profit)
+        let commissionUSD = 0;
+        if (seller && s.items) {
+            s.items.forEach(item => {
+                const itemProfit = (item.priceUSD - (item.costUSD || 0)) * item.qty;
+                if (itemProfit > 0) {
+                    commissionUSD += itemProfit * (commissionPct / 100);
+                }
+            });
+            sellerCommissions[sellerName] = (sellerCommissions[sellerName] || 0) + commissionUSD;
+        }
         
         // Extraer montos individuales de los métodos de pago
         const pm = s.paymentMethods || {};
         const pMovil = parseFloat(pm.movil) || 0;
         const pDebito = parseFloat(pm.debito) || 0;
-        const pCash = parseFloat(pm.cashUSD) || 0;
+        const pCashUSD = parseFloat(pm.cashUSD || pm['efectivo $']) || 0;
+        const pCashBS = parseFloat(pm.cashBS || pm['efectivo Bs']) || 0;
         const pDebt = parseFloat(pm.debt) || 0;
 
         // Sumar a los acumuladores globales
         cumulativeTotals.movil += pMovil;
         cumulativeTotals.debito += pDebito;
-        cumulativeTotals.cashUSD += pCash;
+        cumulativeTotals.cashUSD += pCashUSD;
+        cumulativeTotals.cashBS += pCashBS;
         cumulativeTotals.debt += pDebt;
         totalGlobalUSD += usd;
         totalGlobalBS += bs;
 
-        csv += `${s.date.split('T')[0]};${clientName};${usd.toFixed(2)};${bs.toFixed(2)};${pMovil.toFixed(2)};${pDebito.toFixed(2)};${pCash.toFixed(2)};${pDebt.toFixed(2)};${s.paymentType}\n`;
+        csv += `${s.date.split('T')[0]};${clientName};${sellerName};${usd.toFixed(2)};${bs.toFixed(2)};${pMovil.toFixed(2)};${pDebito.toFixed(2)};${pCashUSD.toFixed(2)};${pCashBS.toFixed(2)};${pDebt.toFixed(2)};${commissionUSD.toFixed(2)};${s.paymentType}\n`;
     });
 
     // Añadir resumen final detallado por cada método de pago
@@ -3126,16 +3469,24 @@ function exportToCSV() {
     csv += "Metodo;Total Acumulado\n";
     csv += `PAGO MOVIL;Bs. ${cumulativeTotals.movil.toFixed(2)}\n`;
     csv += `DEBITO;Bs. ${cumulativeTotals.debito.toFixed(2)}\n`;
-    csv += `DOLARES ($);$ ${cumulativeTotals.cashUSD.toFixed(2)}\n`;
+    csv += `EFECTIVO ($);$ ${cumulativeTotals.cashUSD.toFixed(2)}\n`;
+    csv += `EFECTIVO (BS);Bs. ${cumulativeTotals.cashBS.toFixed(2)}\n`;
     csv += `DEUDOR (DEUDA);Bs. ${cumulativeTotals.debt.toFixed(2)}\n`;
     csv += `\nTOTAL TRANSADO (USD);$ ${totalGlobalUSD.toFixed(2)}\n`;
     csv += `TOTAL TRANSADO (BS);Bs. ${totalGlobalBS.toFixed(2)}\n`;
+
+    // Añadir resumen de comisiones por vendedor
+    csv += "\n\n--- RESUMEN DE COMISIONES POR VENDEDOR ---\n";
+    csv += "Vendedor;Total Comision ($)\n";
+    Object.entries(sellerCommissions).forEach(([name, total]) => {
+        csv += `${name};$ ${total.toFixed(2)}\n`;
+    });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `reporte_ventas_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `reporte_ventas_${UI.getGMTDateString()}.csv`;
     a.click();
     UI.showToast("Reporte detallado exportado");
 }
@@ -3233,3 +3584,40 @@ document.getElementById('close-dolar-actions').addEventListener('click', (e) => 
 });
 
 // Inicialización de la App se maneja vía DOMContentLoaded
+
+// --- Sellers Management ---
+function showAddSellerModal() {
+    UI.openModal('Nuevo Vendedor', `
+        <form onsubmit="event.preventDefault(); saveSeller()">
+            <div style="margin-bottom:12px;">
+                <label style="display:block; margin-bottom:4px; font-size:0.85rem;">Nombre del Vendedor</label>
+                <input type="text" id="s-name" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main);">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="display:block; margin-bottom:4px; font-size:0.85rem;">Comisión (%)</label>
+                <input type="number" id="s-commission" value="0" step="0.1" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main);">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px;">Guardar Vendedor</button>
+        </form>
+    `);
+}
+
+function saveSeller() {
+    const name = document.getElementById('s-name').value;
+    const commission = parseFloat(document.getElementById('s-commission').value) || 0;
+    if (!sellers) sellers = [];
+    sellers.push({ id: Date.now(), name, commission });
+    saveAll();
+    UI.closeModal();
+    renderConfiguracion();
+    UI.showToast('Vendedor guardado', 'success');
+}
+
+function deleteSeller(id) {
+    if (confirm('¿Eliminar este vendedor?')) {
+        sellers = sellers.filter(s => s.id !== id);
+        saveAll();
+        renderConfiguracion();
+        UI.showToast('Vendedor eliminado');
+    }
+}

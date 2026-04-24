@@ -1,98 +1,32 @@
 [
   {
-    "id": 1776698673193,
-    "date": "2026-04-20T15:24:33.193Z",
+    "id": 1776986457312,
+    "date": "2026-04-23T23:20:57.313Z",
     "type": "inventario",
-    "message": "Nuevo producto agregado: Dorito "
+    "message": "Importación masiva: 8 nuevos, 0 actualizados."
   },
   {
-    "id": 1776698740279,
-    "date": "2026-04-20T15:25:40.279Z",
-    "type": "inventario",
-    "message": "Nuevo producto agregado: perrarina "
+    "id": 1776987418070,
+    "date": "2026-04-23T23:36:58.070Z",
+    "type": "tasa",
+    "message": "Tasa BCV actualizada manualmente vía configuración a Bs.483.34"
   },
   {
-    "id": 1776698792137,
-    "date": "2026-04-20T15:26:32.137Z",
-    "type": "inventario",
-    "message": "Producto actualizado: Dorito "
-  },
-  {
-    "id": 1776698826180,
-    "date": "2026-04-20T15:27:06.180Z",
-    "type": "egreso",
-    "message": "Nuevo egreso registrado: Servicios por Bs.24060.88"
-  },
-  {
-    "id": 1776699238122,
-    "date": "2026-04-20T15:33:58.122Z",
+    "id": 1776987558349,
+    "date": "2026-04-23T23:39:18.349Z",
     "type": "venta",
-    "message": "Venta registrada por Bs.S 28.873,06 ($60.00)"
+    "message": "Venta registrada por Bs.S 6.573,40 ($13.60)"
   },
   {
-    "id": 1776699410646,
-    "date": "2026-04-20T15:36:50.646Z",
+    "id": 1776987572397,
+    "date": "2026-04-23T23:39:32.397Z",
     "type": "venta",
-    "message": "Venta registrada por Bs.S 40.422,29 ($84.00)"
+    "message": "Venta registrada por Bs.S 2.202,09 ($4.56)"
   },
   {
-    "id": 1776699423500,
-    "date": "2026-04-20T15:37:03.500Z",
-    "type": "inventario",
-    "message": "Producto actualizado: perrarina "
-  },
-  {
-    "id": 1776699457218,
-    "date": "2026-04-20T15:37:37.218Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 144.365,31 ($300.00)"
-  },
-  {
-    "id": 1776699534077,
-    "date": "2026-04-20T15:38:54.077Z",
+    "id": 1776987591727,
+    "date": "2026-04-23T23:39:51.727Z",
     "type": "egreso",
-    "message": "Nuevo egreso registrado: Otros por Bs.9624.35"
-  },
-  {
-    "id": 1776699614085,
-    "date": "2026-04-20T15:40:14.085Z",
-    "type": "egreso",
-    "message": "Nuevo egreso registrado: Otros por Bs.481.22"
-  },
-  {
-    "id": 1776700052460,
-    "date": "2026-04-20T15:47:32.460Z",
-    "type": "inventario",
-    "message": "Producto actualizado: Dorito "
-  },
-  {
-    "id": 1776700091956,
-    "date": "2026-04-20T15:48:11.956Z",
-    "type": "egreso",
-    "message": "Pérdida de mercancía: 5 u. de Dorito. Stock restante: 20"
-  },
-  {
-    "id": 1776700091959,
-    "date": "2026-04-20T15:48:11.959Z",
-    "type": "egreso",
-    "message": "Nuevo egreso registrado: Pérdida Mercancía por $5.00"
-  },
-  {
-    "id": 1776884272783,
-    "date": "2026-04-22T18:57:52.783Z",
-    "type": "sistema",
-    "message": "Backup automático guardado en el servidor"
-  },
-  {
-    "id": 1776885759347,
-    "date": "2026-04-22T19:22:39.347Z",
-    "type": "venta",
-    "message": "Venta registrada por Bs.S 330,00 ($0.68)"
-  },
-  {
-    "id": 1776886880224,
-    "date": "2026-04-22T19:41:20.224Z",
-    "type": "eliminacion",
-    "message": "Venta ELIMINADA #1776885759347. Cliente: General. Monto reincorporado: Bs.S 330,00"
+    "message": "Nuevo egreso registrado: Compra Mercancía por $10.00"
   }
 ]

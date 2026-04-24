@@ -1,0 +1,839 @@
+{
+  "version": "2.0",
+  "timestamp": "2026-04-23T19:06:52.985Z",
+  "products": [
+    {
+      "id": 1776904126485,
+      "code": "MZ-6202",
+      "name": "ROLINERA 6202 ANTI AGUA TIPO A MEGAZUKI",
+      "costUSD": 0.55,
+      "profitMargin": 70,
+      "priceUSD": 0.935,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126486,
+      "code": "CZ6302",
+      "name": "ROLINERA 6302 CARIBEZUKI",
+      "costUSD": 0.61,
+      "profitMargin": 70,
+      "priceUSD": 1.037,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126487,
+      "code": "CZ6301",
+      "name": "ROLINERA 6301 CARIBEZUKI",
+      "costUSD": 0.52,
+      "profitMargin": 70,
+      "priceUSD": 0.884,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126488,
+      "code": "MZ-6204",
+      "name": "ROLINERA 6204 ANTI-AGUA TIPO MAGAZUKI",
+      "costUSD": 0.76,
+      "profitMargin": 70,
+      "priceUSD": 1.2919999999999998,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126489,
+      "code": "MZ-92",
+      "name": "PRENSA CADENA H-150 MEGAZUKI",
+      "costUSD": 1.08,
+      "profitMargin": 70,
+      "priceUSD": 1.836,
+      "unit": "unid",
+      "stock": 4
+    },
+    {
+      "id": 1776904126490,
+      "code": "MZ-91",
+      "name": "PRENSA CADENA CG150 / JAGUAR MEGAZUKI",
+      "costUSD": 0.38,
+      "profitMargin": 70,
+      "priceUSD": 0.6459999999999999,
+      "unit": "unid",
+      "stock": 4
+    },
+    {
+      "id": 1776904126491,
+      "code": "MZ-1566",
+      "name": "CORONA DORADA GN 428-38T PALETA MEGAZUKI",
+      "costUSD": 2.62,
+      "profitMargin": 70,
+      "priceUSD": 4.454,
+      "unit": "unid",
+      "stock": 1
+    },
+    {
+      "id": 1776904126492,
+      "code": "MZ-1558",
+      "name": "CORONA DORADA CG 428-38T RAYADA MEGAZUKI",
+      "costUSD": 2.64,
+      "profitMargin": 70,
+      "priceUSD": 4.4879999999999995,
+      "unit": "unid",
+      "stock": 1
+    },
+    {
+      "id": 1776904126493,
+      "code": "MZ-1559",
+      "name": "CORONA DORADA CG 428-39T RAYADA MEGAZUKI",
+      "costUSD": 2.68,
+      "profitMargin": 70,
+      "priceUSD": 4.556,
+      "unit": "unid",
+      "stock": 1
+    },
+    {
+      "id": 1776904126494,
+      "code": "MZ-1560",
+      "name": "CORONA DORADA CG 428-40T RAYADA MEGAZUKI",
+      "costUSD": 2.75,
+      "profitMargin": 70,
+      "priceUSD": 4.675,
+      "unit": "unid",
+      "stock": 1
+    },
+    {
+      "id": 1776904126495,
+      "code": "MZ-1599",
+      "name": "CORONA DORADA JAOYIN 428-39T PALETA MEGAZUKI",
+      "costUSD": 2.68,
+      "profitMargin": 70,
+      "priceUSD": 4.556,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126496,
+      "code": "MZ-1569",
+      "name": "CORONA DORADA GN 428-41T PALETA MEGAZUKI",
+      "costUSD": 2.81,
+      "profitMargin": 70,
+      "priceUSD": 4.777,
+      "unit": "unid",
+      "stock": 1
+    },
+    {
+      "id": 1776904126497,
+      "code": "MZ-1561",
+      "name": "CORONA DORADA CG 428-41T RAYADA MEGAZUKI",
+      "costUSD": 2.79,
+      "profitMargin": 70,
+      "priceUSD": 4.743,
+      "unit": "unid",
+      "stock": 1
+    },
+    {
+      "id": 1776904126498,
+      "code": "MZ-1570",
+      "name": "CORONA DORADA GN 428-42T PALETA MEGAZUKI",
+      "costUSD": 3.06,
+      "profitMargin": 70,
+      "priceUSD": 5.202,
+      "unit": "unid",
+      "stock": 1
+    },
+    {
+      "id": 1776904126499,
+      "code": "MZ-709",
+      "name": "CADENA 428H-128L SUPER REFORZADA MEGAZUKI",
+      "costUSD": 4.07,
+      "profitMargin": 70,
+      "priceUSD": 6.9190000000000005,
+      "unit": "unid",
+      "stock": 9
+    },
+    {
+      "id": 1776904126500,
+      "code": "MEG-6020",
+      "name": "BOMBILLO LED PARA FARO 2 CONTACTOS CON ESTROBER MEG-6020",
+      "costUSD": 4.11,
+      "profitMargin": 70,
+      "priceUSD": 6.987,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126501,
+      "code": "MEG-6012",
+      "name": "BOMBILLO LED PARA FARO MEG-6012",
+      "costUSD": 2.81,
+      "profitMargin": 70,
+      "priceUSD": 4.777,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126502,
+      "code": "MZ-1843",
+      "name": "TRIPA 90/90-19 MEGAZUKI",
+      "costUSD": 2.52,
+      "profitMargin": 70,
+      "priceUSD": 4.284,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126503,
+      "code": "MZ-1156",
+      "name": "TRIPA 2.75-21 MEGAZUKI",
+      "costUSD": 2.44,
+      "profitMargin": 70,
+      "priceUSD": 4.148,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126504,
+      "code": "MZ-256",
+      "name": "GUIA DE VALVULA CG150 MEGAZUKI",
+      "costUSD": 0.67,
+      "profitMargin": 70,
+      "priceUSD": 1.139,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126505,
+      "code": "MZ-81",
+      "name": "VALVULA H-150 CON GOMA MEGAZUKI",
+      "costUSD": 0.89,
+      "profitMargin": 70,
+      "priceUSD": 1.513,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126506,
+      "code": "MZ-323",
+      "name": "BOMBA DE FRENO GN MEGAZUKI",
+      "costUSD": 4.02,
+      "profitMargin": 70,
+      "priceUSD": 6.834,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126507,
+      "code": "MZ-324",
+      "name": "BOMBA DE FRENO DELANTERA T-200 MEGAZUKI",
+      "costUSD": 6.05,
+      "profitMargin": 70,
+      "priceUSD": 10.285,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126508,
+      "code": "MZ-245",
+      "name": "GUAYA CROCHE H-150 MEGAZUKI Y (VENMARK)",
+      "costUSD": 0.83,
+      "profitMargin": 70,
+      "priceUSD": 1.411,
+      "unit": "unid",
+      "stock": 4
+    },
+    {
+      "id": 1776904126509,
+      "code": "MZ-252",
+      "name": "GUAYA ACELERACION H-150 MEGAZUKI",
+      "costUSD": 0.76,
+      "profitMargin": 70,
+      "priceUSD": 1.2919999999999998,
+      "unit": "unid",
+      "stock": 4
+    },
+    {
+      "id": 1776904126510,
+      "code": "MZ-248",
+      "name": "GUAYA CROCHE T-200 MEGAZUKI",
+      "costUSD": 0.85,
+      "profitMargin": 70,
+      "priceUSD": 1.4449999999999998,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126511,
+      "code": "MZ-251",
+      "name": "GUAYA ACELERACION T-200 MEGAZUKI",
+      "costUSD": 0.78,
+      "profitMargin": 70,
+      "priceUSD": 1.326,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126512,
+      "code": "GU-79",
+      "name": "GUAYA CROCHE UNIVERSAL 1.8M BSN",
+      "costUSD": 0.42,
+      "profitMargin": 70,
+      "priceUSD": 0.714,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126513,
+      "code": "GU-81",
+      "name": "GUAYA ACELERACION UNIVERSAL 1.8M BSN",
+      "costUSD": 0.42,
+      "profitMargin": 70,
+      "priceUSD": 0.714,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126514,
+      "code": "MZ-1757",
+      "name": "LIGA FRENO 125ML MEGAZUKI",
+      "costUSD": 1.08,
+      "profitMargin": 70,
+      "priceUSD": 1.836,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126515,
+      "code": "MZ-103",
+      "name": "MANILLA CROCHE CON BASE H-150 MEGAZUKI",
+      "costUSD": 2.33,
+      "profitMargin": 70,
+      "priceUSD": 3.9610000000000003,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126516,
+      "code": "MZ-1639",
+      "name": "ACEITE PARA BASTON 120ML MEGAZUKI",
+      "costUSD": 0.97,
+      "profitMargin": 70,
+      "priceUSD": 1.649,
+      "unit": "unid",
+      "stock": 6
+    },
+    {
+      "id": 1776904126517,
+      "code": "MZ-56",
+      "name": "KIT ESTOPERA MOTOR CG150 8PZ MEGAZUKI",
+      "costUSD": 0.76,
+      "profitMargin": 70,
+      "priceUSD": 1.2919999999999998,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126518,
+      "code": "MZ-1609",
+      "name": "KIT ESTOPERA MOTOR GN125 MEGAZUKI / AMMARK",
+      "costUSD": 0.7,
+      "profitMargin": 70,
+      "priceUSD": 1.19,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126519,
+      "code": "MZ-554",
+      "name": "KIT EMPACADURA OVEN-2014 CLASE A MEGAZUKI",
+      "costUSD": 1.6,
+      "profitMargin": 70,
+      "priceUSD": 2.7199999999999998,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126520,
+      "code": "MZ-1988",
+      "name": "LUZ CRUCE EK-EXPRESS-2 DELANTERA LED PAR",
+      "costUSD": 3.95,
+      "profitMargin": 70,
+      "priceUSD": 6.715,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126521,
+      "code": "MZ-1989",
+      "name": "LUZ CRUCE EK-EXPRESS-2 TRASERA LED PAR",
+      "costUSD": 3.93,
+      "profitMargin": 70,
+      "priceUSD": 6.681,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126522,
+      "code": "MZ-2150AM",
+      "name": "LUZ CRUCE CG-120/ESCUDA MICA NARNAJADA PAR MEGAZUKI",
+      "costUSD": 1.75,
+      "profitMargin": 70,
+      "priceUSD": 2.9749999999999996,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126523,
+      "code": "MZ-179",
+      "name": "LUZ CRUCE H-150 MICA NARANJADA PAR",
+      "costUSD": 2.33,
+      "profitMargin": 70,
+      "priceUSD": 3.9610000000000003,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126524,
+      "code": "MZ-1870N",
+      "name": "PORTA PLACA ALUMINO NEGRA",
+      "costUSD": 1.94,
+      "profitMargin": 70,
+      "priceUSD": 3.298,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126525,
+      "code": "MZ-2234",
+      "name": "PORTA PLACA KLR-650 NEGRA CON REFLETOR MEGAZUKI",
+      "costUSD": 2.05,
+      "profitMargin": 70,
+      "priceUSD": 3.4849999999999994,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126526,
+      "code": "CZ736",
+      "name": "MALLA ASIENTO UNIVERSAL NEGRA XL CARIBEZUKI",
+      "costUSD": 2.24,
+      "profitMargin": 70,
+      "priceUSD": 3.8080000000000003,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126527,
+      "code": "MZ-9",
+      "name": "BANDA DE FRENO GN ACANALADA MEGAZUKI",
+      "costUSD": 1.97,
+      "profitMargin": 70,
+      "priceUSD": 3.349,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126528,
+      "code": "CZ451",
+      "name": "BANDA DE FRENO EK-EXPRESS CARIBEZUKI",
+      "costUSD": 1.56,
+      "profitMargin": 70,
+      "priceUSD": 2.652,
+      "unit": "unid",
+      "stock": 4
+    },
+    {
+      "id": 1776904126529,
+      "code": "PA-09",
+      "name": "PASTILLA FRENO SPPED TRASERO BSN(T-200 DELANTERO)",
+      "costUSD": 0.76,
+      "profitMargin": 70,
+      "priceUSD": 1.2919999999999998,
+      "unit": "unid",
+      "stock": 6
+    },
+    {
+      "id": 1776904126530,
+      "code": "MZ-1475",
+      "name": "PASTILLA FRENO T-200 TRASERA MEGAZUKI",
+      "costUSD": 1.18,
+      "profitMargin": 70,
+      "priceUSD": 2.006,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126531,
+      "code": "IP-801087",
+      "name": "ACEITE 4T IPONE 15W50 SEMI-SINTETICO 1L",
+      "costUSD": 11.48,
+      "profitMargin": 70,
+      "priceUSD": 19.516,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126532,
+      "code": "MZ-1671",
+      "name": "PATA ARRANQUE T-200 NEGRA MEGAZUKI",
+      "costUSD": 4.12,
+      "profitMargin": 70,
+      "priceUSD": 7.004,
+      "unit": "unid",
+      "stock": 1
+    },
+    {
+      "id": 1776904126533,
+      "code": "BU-08",
+      "name": "BUJIA D8EA JAGUAR NGK CZ911",
+      "costUSD": 0.6,
+      "profitMargin": 70,
+      "priceUSD": 1.02,
+      "unit": "unid",
+      "stock": 10
+    },
+    {
+      "id": 1776904126534,
+      "code": "MZ-313",
+      "name": "BUJIA D8TC PUNTA DIAMANTE MEGAZUKI",
+      "costUSD": 0.87,
+      "profitMargin": 70,
+      "priceUSD": 1.479,
+      "unit": "unid",
+      "stock": 4
+    },
+    {
+      "id": 1776904126535,
+      "code": "00765",
+      "name": "PERRITO SOLO CADENA 428H CZ613",
+      "costUSD": 0.3,
+      "profitMargin": 70,
+      "priceUSD": 0.51,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126536,
+      "code": "MZ-2033",
+      "name": "EMPACADURA DE CARBURADOR CG-150 2PZ MEGAZUKI",
+      "costUSD": 0.3,
+      "profitMargin": 70,
+      "priceUSD": 0.51,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126537,
+      "code": "CB-01",
+      "name": "PIPA BUJIA CG125/ JAGUA NEGRO BSN",
+      "costUSD": 0.38,
+      "profitMargin": 70,
+      "priceUSD": 0.6459999999999999,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126538,
+      "code": "MZ-1877",
+      "name": "CORNETA ESV MEGAZUKI",
+      "costUSD": 1.37,
+      "profitMargin": 70,
+      "priceUSD": 2.329,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126539,
+      "code": "MZ-428",
+      "name": "CORNETA H-150 MEGAZUKI",
+      "costUSD": 1.71,
+      "profitMargin": 70,
+      "priceUSD": 2.907,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126540,
+      "code": "MZ-1842",
+      "name": "CORNETA CG-150 GRANDE MEGAZUKI",
+      "costUSD": 2.26,
+      "profitMargin": 70,
+      "priceUSD": 3.8419999999999996,
+      "unit": "unid",
+      "stock": 3
+    },
+    {
+      "id": 1776904126541,
+      "code": "MZ-239",
+      "name": "KIT RESORTE CG150 4PZ MEGAZUKI",
+      "costUSD": 0.57,
+      "profitMargin": 70,
+      "priceUSD": 0.9689999999999999,
+      "unit": "unid",
+      "stock": 4
+    },
+    {
+      "id": 1776904126542,
+      "code": "CZ160",
+      "name": "DISCO DE CROCHE T-200 6 PIEZAS CARIBEZUKI",
+      "costUSD": 1.88,
+      "profitMargin": 70,
+      "priceUSD": 3.1959999999999997,
+      "unit": "unid",
+      "stock": 4
+    },
+    {
+      "id": 1776904126543,
+      "code": "MZ-413",
+      "name": "CDI H-150 MEGAZUKI",
+      "costUSD": 3.47,
+      "profitMargin": 70,
+      "priceUSD": 5.899,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126544,
+      "code": "MZ-543",
+      "name": "FLASH 12V MEGAZUKI",
+      "costUSD": 0.64,
+      "profitMargin": 70,
+      "priceUSD": 1.088,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126545,
+      "code": "MZ-1694",
+      "name": "ADAPTADOR/CABLE PARA BOMBILLO LED C6-H4 UND",
+      "costUSD": 0.42,
+      "profitMargin": 70,
+      "priceUSD": 0.714,
+      "unit": "unid",
+      "stock": 5
+    },
+    {
+      "id": 1776904126546,
+      "code": "MZ-1975A",
+      "name": "BOMBILLO MUELITA LED MZ-80-AZ AZUL",
+      "costUSD": 0.42,
+      "profitMargin": 70,
+      "priceUSD": 0.714,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126547,
+      "code": "MZ-1975R",
+      "name": "BOMBILLO MUELITA LED MZ-80-R ROJO",
+      "costUSD": 0.42,
+      "profitMargin": 70,
+      "priceUSD": 0.714,
+      "unit": "unid",
+      "stock": 2
+    },
+    {
+      "id": 1776904126548,
+      "code": "MZ-212",
+      "name": "FILTRO GASOLINA",
+      "costUSD": 0.28,
+      "profitMargin": 70,
+      "priceUSD": 0.47600000000000003,
+      "unit": "unid",
+      "stock": 10
+    },
+    {
+      "id": 1776904126549,
+      "code": "MZ-1166",
+      "name": "KIT TRANCA PIÑON H-150 MEGAZUKI",
+      "costUSD": 0.41,
+      "profitMargin": 70,
+      "priceUSD": 0.697,
+      "unit": "unid",
+      "stock": 5
+    }
+  ],
+  "clients": [],
+  "sales": [],
+  "payments": [],
+  "egresos": [],
+  "logs": [
+    {
+      "id": 1776902943055,
+      "date": "2026-04-23T00:09:03.055Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776902944790,
+      "date": "2026-04-23T00:09:04.790Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903131935,
+      "date": "2026-04-23T00:12:11.935Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903133422,
+      "date": "2026-04-23T00:12:13.422Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903134494,
+      "date": "2026-04-23T00:12:14.494Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903136262,
+      "date": "2026-04-23T00:12:16.262Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903137262,
+      "date": "2026-04-23T00:12:17.262Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903138557,
+      "date": "2026-04-23T00:12:18.557Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903139583,
+      "date": "2026-04-23T00:12:19.583Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903141590,
+      "date": "2026-04-23T00:12:21.590Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903143270,
+      "date": "2026-04-23T00:12:23.270Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903152214,
+      "date": "2026-04-23T00:12:32.214Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903154662,
+      "date": "2026-04-23T00:12:34.662Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903159231,
+      "date": "2026-04-23T00:12:39.231Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903283830,
+      "date": "2026-04-23T00:14:43.830Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903464422,
+      "date": "2026-04-23T00:17:44.422Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903470446,
+      "date": "2026-04-23T00:17:50.446Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776903471901,
+      "date": "2026-04-23T00:17:51.901Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776904126489,
+      "date": "2026-04-23T00:28:46.489Z",
+      "type": "inventario",
+      "message": "Importación masiva: 65 nuevos, 0 actualizados."
+    },
+    {
+      "id": 1776904304942,
+      "date": "2026-04-23T00:31:44.942Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776904306437,
+      "date": "2026-04-23T00:31:46.437Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776904307389,
+      "date": "2026-04-23T00:31:47.389Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776904308334,
+      "date": "2026-04-23T00:31:48.334Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776904309389,
+      "date": "2026-04-23T00:31:49.389Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776904311357,
+      "date": "2026-04-23T00:31:51.357Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776904316750,
+      "date": "2026-04-23T00:31:56.750Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776904318566,
+      "date": "2026-04-23T00:31:58.566Z",
+      "type": "tasa",
+      "message": "Tasa BCV actualizada manualmente vía configuración a Bs.482.76"
+    },
+    {
+      "id": 1776942380912,
+      "date": "2026-04-23T11:06:20.912Z",
+      "type": "sistema",
+      "message": "Backup automático guardado en el servidor"
+    }
+  ],
+  "sellers": [],
+  "settings": {
+    "lowStockThreshold": 1,
+    "businessName": "ZudoMotos",
+    "businessRIF": "",
+    "businessPhone": "",
+    "businessAddress": "",
+    "theme": "theme-dark"
+  }
+}

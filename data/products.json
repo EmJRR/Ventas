@@ -1,22 +1,82 @@
 [
   {
-    "id": 1776698673186,
-    "code": "1",
-    "name": "Dorito",
-    "costUSD": 1,
-    "profitMargin": 20,
-    "priceUSD": 1.2,
-    "unit": "unid",
-    "stock": 20
-  },
-  {
-    "id": 1776698740273,
-    "code": "45864",
-    "name": "perrarina",
-    "costUSD": 25,
-    "profitMargin": 20,
-    "priceUSD": 30,
+    "id": 1776986457310,
+    "code": "MZ-1566",
+    "name": "CORONA DORADA GN 428-38T PALETA MEGAZUKI",
+    "costUSD": 2.62,
+    "profitMargin": 70,
+    "priceUSD": 4.454,
     "unit": "unid",
     "stock": 0
+  },
+  {
+    "id": 1776986457311,
+    "code": "MZ-1557",
+    "name": "CORONA DORADA CG 428-37T RAYADA MEGAZUKI",
+    "costUSD": 2.57,
+    "profitMargin": 70,
+    "priceUSD": 4.369,
+    "unit": "unid",
+    "stock": 0
+  },
+  {
+    "id": 1776986457312,
+    "code": "MZ-1559",
+    "name": "CORONA DORADA CG 428-39T RAYADA MEGAZUKI",
+    "costUSD": 2.68,
+    "profitMargin": 70,
+    "priceUSD": 4.556,
+    "unit": "unid",
+    "stock": 1
+  },
+  {
+    "id": 1776986457313,
+    "code": "MZ-1599",
+    "name": "CORONA DORADA JAOYIN 428-39T PALETA MEGAZUKI",
+    "costUSD": 2.68,
+    "profitMargin": 70,
+    "priceUSD": 4.556,
+    "unit": "unid",
+    "stock": 1
+  },
+  {
+    "id": 1776986457314,
+    "code": "MZ-1569",
+    "name": "CORONA DORADA GN 428-41T PALETA MEGAZUKI",
+    "costUSD": 2.81,
+    "profitMargin": 70,
+    "priceUSD": 4.777,
+    "unit": "unid",
+    "stock": 0
+  },
+  {
+    "id": 1776986457315,
+    "code": "MZ-1561",
+    "name": "CORONA DORADA CG 428-41T RAYADA MEGAZUKI",
+    "costUSD": 2.79,
+    "profitMargin": 70,
+    "priceUSD": 4.743,
+    "unit": "unid",
+    "stock": 2
+  },
+  {
+    "id": 1776986457316,
+    "code": "MZ-1562",
+    "name": "CORONA DORADA CG 428-42T RAYADA MEGAZUKI",
+    "costUSD": 2.87,
+    "profitMargin": 70,
+    "priceUSD": 4.879,
+    "unit": "unid",
+    "stock": 2
+  },
+  {
+    "id": 1776986457317,
+    "code": "MEG-6045",
+    "name": "BOMBILLO LED H4 MEG-6045",
+    "costUSD": 1.97,
+    "profitMargin": 70,
+    "priceUSD": 3.349,
+    "unit": "unid",
+    "stock": 3
   }
 ]

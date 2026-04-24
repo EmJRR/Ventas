@@ -5,7 +5,6 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -89,25 +88,10 @@ app.post('/api/backup/silent', (req, res) => {
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+// ⚠️ PARTE CRÍTICA - Debe ser EXACTAMENTE así:
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.IP || '::';  // ← '::' es IPv6, OBLIGATORIO
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.clear();
-    console.log('=========================================');
-    console.log('   SISTEMA DE VENTAS - SERVIDOR LOCAL    ');
-    console.log('=========================================');
-    console.log(`\nLaptop: http://localhost:${PORT}`);
-
-    // Attempt to show local IP
-    const { networkInterfaces } = require('os');
-    const nets = networkInterfaces();
-    console.log('\nMóvil (desde el mismo WiFi):');
-    for (const name of Object.keys(nets)) {
-        for (const net of nets[name]) {
-            if (net.family === 'IPv4' && !net.internal) {
-                console.log(`👉 http://${net.address}:${PORT}`);
-            }
-        }
-    }
-    console.log('\n-----------------------------------------');
-    console.log('Presiona Ctrl+C para detener el servidor');
+app.listen(PORT, HOST, () => {
+    console.log(`✅ Servidor corriendo en http://[${HOST}]:${PORT}`);
 });

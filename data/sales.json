@@ -1,77 +1,74 @@
 [
   {
-    "id": 1776699238122,
-    "date": "2026-04-20T15:33:58.122Z",
+    "id": 1776987558349,
+    "date": "2026-04-23T23:39:18.349Z",
     "clientId": 0,
+    "sellerId": null,
     "items": [
       {
-        "id": 1776698740273,
-        "name": "perrarina",
-        "qty": 2,
-        "priceUSD": 30,
-        "costUSD": 25
+        "id": 1776986457310,
+        "name": "CORONA DORADA GN 428-38T PALETA MEGAZUKI",
+        "qty": 1,
+        "priceUSD": 4.454,
+        "costUSD": 2.62,
+        "isService": false
+      },
+      {
+        "id": 1776986457311,
+        "name": "CORONA DORADA CG 428-37T RAYADA MEGAZUKI",
+        "qty": 1,
+        "priceUSD": 4.369,
+        "costUSD": 2.57,
+        "isService": false
+      },
+      {
+        "id": 1776986457314,
+        "name": "CORONA DORADA GN 428-41T PALETA MEGAZUKI",
+        "qty": 1,
+        "priceUSD": 4.777,
+        "costUSD": 2.81,
+        "isService": false
       }
     ],
-    "totalUSD": 60,
-    "totalBS": 28873.061999999998,
+    "totalUSD": 13.600000000000001,
+    "totalBS": 6573.39544,
     "paymentMethods": {
-      "movil": 0,
+      "movil": 6573.4,
       "debito": 0,
-      "efectivo $": 0,
-      "efectivo Bs": 28873.06,
+      "cashUSD": 0,
+      "cashBS": 0,
       "debt": 0
     },
     "paymentType": "completo",
-    "bcvRate": 481.2177
+    "bcvRate": 483.3379,
+    "isService": false
   },
   {
-    "id": 1776699410646,
-    "date": "2026-04-20T15:36:50.646Z",
+    "id": 1776987572397,
+    "date": "2026-04-23T23:39:32.397Z",
     "clientId": 0,
+    "sellerId": null,
     "items": [
       {
-        "id": 1776698673186,
-        "name": "Dorito",
-        "qty": 70,
-        "priceUSD": 1.2,
-        "costUSD": 1
+        "id": 1776986457313,
+        "name": "CORONA DORADA JAOYIN 428-39T PALETA MEGAZUKI",
+        "qty": 1,
+        "priceUSD": 4.556,
+        "costUSD": 2.68,
+        "isService": false
       }
     ],
-    "totalUSD": 84,
-    "totalBS": 40422.2868,
+    "totalUSD": 4.556,
+    "totalBS": 2202.0874724,
     "paymentMethods": {
-      "movil": 0,
+      "movil": 2202.09,
       "debito": 0,
-      "efectivo $": 0,
-      "efectivo Bs": 40422.29,
+      "cashUSD": 0,
+      "cashBS": 0,
       "debt": 0
     },
     "paymentType": "completo",
-    "bcvRate": 481.2177
-  },
-  {
-    "id": 1776699457217,
-    "date": "2026-04-20T15:37:37.217Z",
-    "clientId": 0,
-    "items": [
-      {
-        "id": 1776698740273,
-        "name": "perrarina",
-        "qty": 10,
-        "priceUSD": 30,
-        "costUSD": 25
-      }
-    ],
-    "totalUSD": 300,
-    "totalBS": 144365.31,
-    "paymentMethods": {
-      "movil": 0,
-      "debito": 0,
-      "efectivo $": 0,
-      "efectivo Bs": 144365.31,
-      "debt": 0
-    },
-    "paymentType": "completo",
-    "bcvRate": 481.2177
+    "bcvRate": 483.3379,
+    "isService": false
   }
 ]

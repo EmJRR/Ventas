@@ -19,6 +19,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Html5-QRCode for Barcode Scanning -->
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- SheetJS for Excel Import -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="css/main.css">
     <style>
         #scanner-container { border: 2px dashed #6366f1 !important; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 15px; }
@@ -108,7 +110,7 @@
             <div class="sidebar-header">
                 <div class="logo">
                     <i data-lucide="shield-check"></i>
-                    <span style="color: black">SoluVentas</span>
+                    <span id="business-logo-text">SoluVentas</span>
                 </div>
                 <button class="mobile-close" id="mobile-close">
                     <i data-lucide="chevron-left"></i>
